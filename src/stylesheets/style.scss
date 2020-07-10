@@ -23,6 +23,21 @@ $menu-item-hover-color: $white;
   padding-top: 1rem;
 }
 
+strong {
+  color: $white;
+}
+
+code {
+  color: $white;
+  background-color: $black-bis;
+}
+
+pre {
+  color: $white;
+  background-color: $black-bis;
+  padding: 0 !important;
+}
+
 /* The sidebar menu */
 .right-sidebar {
   padding: 20px;

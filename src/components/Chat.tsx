@@ -5,6 +5,7 @@ import { client } from '../App';
 import { Link } from 'react-router-dom';
 import { IClientInfo, IChatMessage, IUser } from 'libvex/dist/Client';
 import { getUserColor, getUserHexTag } from '../utils/getUserColor';
+import ReactMarkdown from 'react-markdown';
 
 type State = {
   channelList: IChannel[];
@@ -204,7 +205,7 @@ export class Chat extends Component<Props, State> {
                             index.toString()
                           }
                         >
-                          {message.message}
+                          <ReactMarkdown source={message.message} />
                         </p>
                       ))}
                     </div>
