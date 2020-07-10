@@ -1,20 +1,26 @@
 import React from 'react';
 import './stylesheets/style.scss'
 
-function App() {
+function App() {  
   return (
     <div>
       <div className="left-sidebar has-background-black-ter">
       </div>
-      <div className="left-channelbar has-background-grey-darker">
+      <div className="left-channelbar has-background-black-bis">
       </div>
-      <div className="top-bar has-background-grey-dark">
+      <div className="top-bar">
+        <div className="top-bar-left has-background-black-bis"></div>
+        <div className="top-bar-right has-background-black-ter"></div>
       </div>
-      <div className="chat-window has-background-grey-light">
+
+      <div className="chat-window has-background-black-ter">
       </div> 
-      <div className="bottom-bar has-background-grey-light">
+      <div className="bottom-bar has-background-black-ter">
+        <div className="chat-input-wrapper has-background-grey-darker">
+          <textarea  className="chat-input" />
+        </div>
       </div> 
-      <div className="right-sidebar has-background-dark">
+      <div className="right-sidebar has-background-black-bis">
       </div>
     </div>
   )
