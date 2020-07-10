@@ -205,7 +205,7 @@ export class Chat extends Component<Props, State> {
                             index.toString()
                           }
                         >
-                          <ReactMarkdown source={message.message} />
+                          <ReactMarkdown source={message.message}  />
                         </p>
                       ))}
                     </div>
