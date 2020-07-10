@@ -5,7 +5,7 @@ import { Root } from './Root';
 import { KeyRing, Client, Utils } from 'libvex';
 
 export const keyring = new KeyRing(':memory:', localStorage.getItem('pk'));
-export const client = new Client('dev.vex.chat', keyring, null, true);
+export const client = new Client('localhost:8000', keyring, null, false);
 
 client.on('ready', async () => {
   if (!localStorage.getItem('pk')) {
@@ -14,7 +14,6 @@ client.on('ready', async () => {
   }
 
   await client.auth();
-  client.emit('authed');
 });
 
 function App() {

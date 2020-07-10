@@ -1,11 +1,11 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { Component } from 'react';
-import { IChannel } from 'libvex';
+import { IChannel, IClientInfo, IChatMessage, IUser } from 'libvex';
 import { client } from '../App';
 import { Link } from 'react-router-dom';
-import { IClientInfo, IChatMessage, IUser } from 'libvex/dist/Client';
 import { getUserColor, getUserHexTag } from '../utils/getUserColor';
 import ReactMarkdown from 'react-markdown';
+import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 
 type State = {
   channelList: IChannel[];
@@ -13,6 +13,8 @@ type State = {
   onlineLists: Record<string, IUser[]>;
   chatHistory: Record<string, IChatMessage[]>;
   inputValue: string;
+  modalIsActive: boolean;
+  modalContents: JSX.Element;
 };
 
 type Props = {
@@ -30,11 +32,18 @@ export class Chat extends Component<Props, State> {
       clientInfo: client.info(),
       inputValue: '',
       onlineLists: {},
+      modalIsActive: false,
+      modalContents: <span />,
     };
+
+    this.scrollToBottom = this.scrollToBottom.bind(this);
+    this.changeNickname = this.changeNickname.bind(this);
+    this.openModal = this.openModal.bind(this);
+    this.closeModal = this.closeModal.bind(this);
   }
 
   componentDidMount() {
-    client.on('authed' as any, async () => {
+    client.on('authed', async () => {
       const channelList = await client.channels.retrieve();
       this.setState({
         channelList,
@@ -100,8 +109,10 @@ export class Chat extends Component<Props, State> {
         chunked[rowCount].push(post);
       }
       if (
-        (chunked[rowCount][chunked[rowCount].length - 1] as any).userID ===
-        (post as any).userID
+        chunked[rowCount][chunked[rowCount].length - 1].userID ===
+          post.userID &&
+        chunked[rowCount][chunked[rowCount].length - 1].username ===
+          post.username
       ) {
         chunked[rowCount].push(post);
       } else {
@@ -113,13 +124,86 @@ export class Chat extends Component<Props, State> {
     return chunked;
   };
 
+  changeNickname(e: any, data: any) {
+    let inputRef: any = React.createRef();
+    const nicknameChanger = (
+      <form
+        onSubmit={async (event) => {
+          event.preventDefault();
+          if (inputRef.value === '') {
+            return;
+          }
+          this.closeModal();
+          await client.users.nick(inputRef.value);
+          // nick function here
+        }}
+      >
+        <p className="has-text-white">CHANGE NICKNAME</p>
+        <br />
+        <input
+          autoFocus
+          ref={(ref) => (inputRef = ref)}
+          className={`input is-danger`}
+        ></input>
+        <div className="modal-bottom-strip has-text-right">
+          <button className="button is-danger" type="submit">
+            Save
+          </button>
+        </div>
+      </form>
+    );
+    this.openModal(nicknameChanger);
+  }
+
+  openModal(el: JSX.Element) {
+    this.setState({
+      modalIsActive: true,
+      modalContents: el,
+    });
+  }
+
+  closeModal() {
+    this.setState({
+      modalIsActive: false,
+      modalContents: <span />,
+    });
+  }
+
   render() {
     const chunkedArray = this.state.chatHistory[this.props.match.params.id]
       ? this.chunkPosts(this.state.chatHistory[this.props.match.params.id])
       : [[]];
 
     return (
-      <div>
+      <div
+        onKeyDown={(event) => {
+          if (event.key === 'Escape' && this.state.modalIsActive) {
+            this.closeModal();
+          }
+        }}
+      >
+        <div
+          className={`modal ${
+            this.state.modalIsActive ? 'is-active' : ''
+          } is-clipped`}
+        >
+          <div className="modal-background" onClick={this.closeModal}></div>
+          <div className="modal-content">
+            <div className="box has-background-black-bis">
+              {this.state.modalContents && this.state.modalContents}
+            </div>
+          </div>
+          <button
+            className="modal-close is-large"
+            aria-label="close"
+            onClick={() => {
+              this.setState({
+                modalIsActive: false,
+              });
+            }}
+          />
+        </div>
+
         <div className="left-sidebar has-background-black-ter"></div>
         <div className="top-bar">
           <div className="top-bar-left has-background-black-bis">
@@ -178,25 +262,43 @@ export class Chat extends Component<Props, State> {
                   </figure>
                   <div className="media-content">
                     <div>
-                      <a
-                        className="message-username has-text-weight-bold"
-                        style={{
-                          color: getUserColor((messages as any)[0].userID),
-                        }}
+                      <ContextMenuTrigger
+                        id={'username-trigger-' + messages[0].messageID}
                       >
-                        {messages[0].username}
-                        <span className="translucent">
-                          #{getUserHexTag((messages[0] as any).userID)}
-                        </span>
-                      </a>{' '}
-                      <small>
-                        {new Date(
-                          (messages[0] as any).createdAt
-                        ).toLocaleTimeString()}
-                      </small>
-                      <br />
+                        <span
+                          className="message-username has-text-weight-bold"
+                          style={{
+                            color: getUserColor(messages[0].userID),
+                          }}
+                        >
+                          {messages[0].username}
+                          <span className="translucent">
+                            #{getUserHexTag(messages[0].userID)}
+                          </span>
+                        </span>{' '}
+                        <small>
+                          {new Date(messages[0].createdAt).toLocaleTimeString()}
+                        </small>
+                      </ContextMenuTrigger>
+                      <ContextMenu
+                        id={'username-trigger-' + messages[0].messageID}
+                      >
+                        {messages[0].userID ===
+                          client.info().client?.userID && (
+                          <MenuItem
+                            data={messages[0]}
+                            onClick={this.changeNickname}
+                          >
+                            Change Nickname
+                          </MenuItem>
+                        )}
+
+                        <MenuItem data={messages[0]} onClick={() => {}}>
+                          View Profile
+                        </MenuItem>
+                      </ContextMenu>
                       {messages.map((message, index) => (
-                        <p
+                        <span
                           className="chat-message has-text-white"
                           key={
                             'chat-message-text-' +
@@ -205,8 +307,8 @@ export class Chat extends Component<Props, State> {
                             index.toString()
                           }
                         >
-                          <ReactMarkdown source={message.message}  />
-                        </p>
+                          <ReactMarkdown source={message.message} />
+                        </span>
                       ))}
                     </div>
                   </div>
@@ -252,22 +354,38 @@ export class Chat extends Component<Props, State> {
               {this.state.onlineLists[this.props.match.params.id] &&
                 this.state.onlineLists[this.props.match.params.id].map(
                   (user) => (
-                    <a key={'online-user-' + user.userID}>
-                      <li>
-                        {' '}
-                        <span
-                          className="message-username has-text-weight-bold"
-                          style={{
-                            color: getUserColor(user.userID),
-                          }}
-                        >
-                          {user.username}
-                          <span className="translucent">
-                            #{getUserHexTag(user.userID)}
-                          </span>
-                        </span>
-                      </li>
-                    </a>
+                    <div key={'online-user-' + user.userID}>
+                      <ContextMenuTrigger
+                        id={'online-user-trigger-' + user.userID}
+                      >
+                        <a>
+                          <li>
+                            {' '}
+                            <span
+                              className="message-username has-text-weight-bold"
+                              style={{
+                                color: getUserColor(user.userID),
+                              }}
+                            >
+                              {user.username}
+                              <span className="translucent">
+                                #{getUserHexTag(user.userID)}
+                              </span>
+                            </span>
+                          </li>
+                        </a>
+                      </ContextMenuTrigger>
+                      <ContextMenu id={'online-user-trigger-' + user.userID}>
+                        {user.userID === client.info().client?.userID && (
+                          <MenuItem data={user} onClick={this.changeNickname}>
+                            Change Nickname
+                          </MenuItem>
+                        )}
+                        <MenuItem data={user} onClick={() => {}}>
+                          View Profile
+                        </MenuItem>
+                      </ContextMenu>
+                    </div>
                   )
                 )}
             </ul>

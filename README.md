@@ -10,4 +10,3 @@ cd conflux
 yarn
 yarn start
 ```
-

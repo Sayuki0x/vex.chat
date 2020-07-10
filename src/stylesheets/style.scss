@@ -38,6 +38,47 @@ pre {
   padding: 0 !important;
 }
 
+input {
+  background-color: transparent !important;
+  color: $white !important;
+}
+
+.modal-bottom-strip {
+  padding-top: 10px;
+}
+
+.react-contextmenu-wrapper {
+  cursor: pointer;
+}
+
+.react-contextmenu {
+  color: $white;
+  background-color: $black-bis;
+  padding: 10px;
+  z-index: 4;
+  width: 180px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+
+.react-contextmenu-item {
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  padding: 4px 8px 4px 8px;
+  cursor: pointer;
+}
+
+.react-contextmenu-item:hover {
+  background-color: $red;
+}
+
+.react-contextmenu-item--divider {
+  padding: 2px;
+  background-color: $black-ter;
+}
+
 /* The sidebar menu */
 .right-sidebar {
   padding: 20px;
