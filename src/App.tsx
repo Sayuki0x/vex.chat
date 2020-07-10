@@ -1,26 +1,23 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import './stylesheets/style.scss'
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <div className="left-sidebar has-background-black-ter">
+      </div>
+      <div className="left-channelbar has-background-grey-darker">
+      </div>
+      <div className="top-bar has-background-grey-dark">
+      </div>
+      <div className="chat-window has-background-grey-light">
+      </div> 
+      <div className="bottom-bar has-background-grey-light">
+      </div> 
+      <div className="right-sidebar has-background-dark">
+      </div>
     </div>
-  );
+  )
 }
 
 export default App;
