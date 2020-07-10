@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { Component } from 'react';
 import { IChannel } from 'libvex';
 import { client } from '../App';
@@ -87,7 +88,35 @@ export class Chat extends Component<Props, State> {
     this.messagesEnd.current.scrollIntoView({});
   };
 
+  chunkPosts = (posts: IChatMessage[]) => {
+    const chunked: IChatMessage[][] = [[]];
+    let rowCount = 0;
+    for (const post of posts) {
+      if (!chunked[rowCount]) {
+        chunked.push([]);
+      }
+      if (chunked[rowCount].length === 0) {
+        chunked[rowCount].push(post);
+      }
+      if (
+        (chunked[rowCount][chunked[rowCount].length - 1] as any).userID ===
+        (post as any).userID
+      ) {
+        chunked[rowCount].push(post);
+      } else {
+        chunked.push([]);
+        chunked[rowCount + 1].push(post);
+        rowCount++;
+      }
+    }
+    return chunked;
+  };
+
   render() {
+    const chunkedArray = this.state.chatHistory[this.props.match.params.id]
+      ? this.chunkPosts(this.state.chatHistory[this.props.match.params.id])
+      : [[]];
+
     return (
       <div>
         <div className="left-sidebar has-background-black-ter"></div>
@@ -99,13 +128,18 @@ export class Chat extends Component<Props, State> {
           </div>
           <div className="top-bar-right has-background-black-ter">
             <div className="columns"></div>
-            <h1 className="title is-size-4 has-text-white">{this.state.channelList.map((channel) => {
-              if (channel.channelID === this.props.match.params.id) {
-                return <span key={"channel-title-"+channel.channelID}>#{channel.name}</span>
-              } else {
-                return null;
-              }
-            })}
+            <h1 className="title is-size-4 has-text-white">
+              {this.state.channelList.map((channel) => {
+                if (channel.channelID === this.props.match.params.id) {
+                  return (
+                    <span key={'channel-title-' + channel.channelID}>
+                      #{channel.name}
+                    </span>
+                  );
+                } else {
+                  return null;
+                }
+              })}
             </h1>
           </div>
         </div>
@@ -125,50 +159,60 @@ export class Chat extends Component<Props, State> {
         </div>
         <div className="chat-window has-background-black-ter">
           <div className="chat-message-wrapper">
-            {this.state.chatHistory[this.props.match.params.id] &&
-              this.state.chatHistory[this.props.match.params.id].map(
-                (message) => (
-                  <article
-                    className="media chat-message"
-                    key={'chat-message-' + message.messageID}
-                  >
-                    <figure className="media-left">
-                      <p className="image is-48x48">
-                        <img
-                          src="https://bulma.io/images/placeholders/128x128.png"
-                          className="is-rounded"
-                          alt="user avatar"
-                        />
-                      </p>
-                    </figure>
-                    <div className="media-content">
-                      <div>
-                        <a
-                          className="message-username has-text-weight-bold"
-                          style={{
-                            color: getUserColor((message as any).userID),
-                          }}
+            {chunkedArray.map((messages) => {
+              if (messages.length === 0) return null;
+              return (
+                <article
+                  className="media chat-message"
+                  key={'chat-message-block-' + messages[0].messageID}
+                >
+                  <figure className="media-left">
+                    <p className="image is-48x48">
+                      <img
+                        src="https://bulma.io/images/placeholders/128x128.png"
+                        className="is-rounded"
+                        alt="user avatar"
+                      />
+                    </p>
+                  </figure>
+                  <div className="media-content">
+                    <div>
+                      <a
+                        className="message-username has-text-weight-bold"
+                        style={{
+                          color: getUserColor((messages as any)[0].userID),
+                        }}
+                      >
+                        {messages[0].username}
+                        <span className="translucent">
+                          #{getUserHexTag((messages[0] as any).userID)}
+                        </span>
+                      </a>{' '}
+                      <small>
+                        {new Date(
+                          (messages[0] as any).createdAt
+                        ).toLocaleTimeString()}
+                      </small>
+                      <br />
+                      {messages.map((message, index) => (
+                        <p
+                          className="chat-message has-text-white"
+                          key={
+                            'chat-message-text-' +
+                            message.messageID +
+                            '-' +
+                            index.toString()
+                          }
                         >
-                          {message.username}
-                          <span className="translucent">
-                            #{getUserHexTag((message as any).userID)}
-                          </span>
-                        </a>{' '}
-                        <small>
-                          {new Date(
-                            (message as any).createdAt
-                          ).toLocaleTimeString()}
-                        </small>
-                        <br />
-                        <p className="chat-message has-text-white">
                           {message.message}
                         </p>
-                      </div>
+                      ))}
                     </div>
-                    <div className="media-right"></div>
-                  </article>
-                )
-              )}
+                  </div>
+                  <div className="media-right"></div>
+                </article>
+              );
+            })}
             <div
               style={{ float: 'left', clear: 'both' }}
               ref={this.messagesEnd}
@@ -207,7 +251,6 @@ export class Chat extends Component<Props, State> {
               {this.state.onlineLists[this.props.match.params.id] &&
                 this.state.onlineLists[this.props.match.params.id].map(
                   (user) => (
-                    // eslint-disable-next-line jsx-a11y/anchor-is-valid
                     <a key={'online-user-' + user.userID}>
                       <li>
                         {' '}
