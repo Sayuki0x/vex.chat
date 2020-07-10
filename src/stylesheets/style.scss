@@ -17,6 +17,12 @@ $menu-item-hover-color: $white;
 
 @import '../../node_modules/bulma/bulma.sass';
 
+.media + .media {
+  border-top:none;
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
 /* The sidebar menu */
 .right-sidebar {
   padding: 20px;

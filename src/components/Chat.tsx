@@ -32,7 +32,6 @@ export class Chat extends Component<Props, State> {
   }
 
   componentDidMount() {
-    console.log(this.props.match);
     client.on('authed' as any, async () => {
       const channelList = await client.channels.retrieve();
       this.setState({
@@ -100,9 +99,9 @@ export class Chat extends Component<Props, State> {
           </div>
           <div className="top-bar-right has-background-black-ter">
             <div className="columns"></div>
-            <h1 className="title is-size-4 has-text-white">#{this.state.channelList.map((channel) => {
+            <h1 className="title is-size-4 has-text-white">{this.state.channelList.map((channel) => {
               if (channel.channelID === this.props.match.params.id) {
-                return <span key={"channel-title-"+channel.channelID}> {channel.name}</span>
+                return <span key={"channel-title-"+channel.channelID}>#{channel.name}</span>
               } else {
                 return null;
               }
@@ -144,7 +143,7 @@ export class Chat extends Component<Props, State> {
                     </figure>
                     <div className="media-content">
                       <div>
-                        <span
+                        <a
                           className="message-username has-text-weight-bold"
                           style={{
                             color: getUserColor((message as any).userID),
@@ -154,7 +153,7 @@ export class Chat extends Component<Props, State> {
                           <span className="translucent">
                             #{getUserHexTag((message as any).userID)}
                           </span>
-                        </span>{' '}
+                        </a>{' '}
                         <small>
                           {new Date(
                             (message as any).createdAt
@@ -187,8 +186,8 @@ export class Chat extends Component<Props, State> {
                 });
               }}
               onKeyPress={async (event) => {
-                console.log(event.key);
                 if (event.key === 'Enter') {
+                  event.preventDefault();
                   await client.messages.send(
                     this.props.match.params.id,
                     this.state.inputValue
@@ -209,8 +208,8 @@ export class Chat extends Component<Props, State> {
                 this.state.onlineLists[this.props.match.params.id].map(
                   (user) => (
                     // eslint-disable-next-line jsx-a11y/anchor-is-valid
-                    <a>
-                      <li key={'online-user-' + user.userID}>
+                    <a key={'online-user-' + user.userID}>
+                      <li>
                         {' '}
                         <span
                           className="message-username has-text-weight-bold"
