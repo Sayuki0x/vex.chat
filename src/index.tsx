@@ -3,6 +3,19 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+import { KeyRing, Client, Utils } from "libvex";
+
+export const keyring = new KeyRing(":memory:", localStorage.getItem("pk"))
+export const client = new Client("dev.vex.chat", keyring, null, true);
+
+client.on("ready", async () => {
+  if (!localStorage.getItem("pk")) {
+    await client.register();
+    localStorage.setItem("pk", Utils.toHexString(keyring.getPriv()))
+  }
+
+  await client.auth();
+})
 
 ReactDOM.render(
   <React.StrictMode>
