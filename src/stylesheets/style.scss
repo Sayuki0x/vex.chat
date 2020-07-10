@@ -12,10 +12,14 @@ $cyan: #ae81ff;
 $turquoise: #2aa198;
 $white: #f8f8f2;
 
+$menu-item-hover-background-color: $black-ter;
+$menu-item-hover-color: $white;
+
 @import '../../node_modules/bulma/bulma.sass';
 
 /* The sidebar menu */
 .right-sidebar {
+  padding: 20px;
   height: calc(
     100% - 50px
   ); /* Full-height: remove this if you want "auto" height */
@@ -41,25 +45,28 @@ $white: #f8f8f2;
 }
 
 .top-bar-left {
+  padding: 15px 20px 15px 20px;
   position: absolute;
   width: 263px;
   height: 100%;
   left: 0;
   z-index: 2;
-  border-bottom: $black-ter 12px solid;
+  border-bottom: $black-ter 1px solid;
 }
 
 .top-bar-right {
+  padding: 15px 20px 15px 20px;
   position: absolute;
   width: 100%;
   height: 100%;
   left: 263px;
   z-index: 2;
-  border-bottom: $black-bis 12px solid;
+  border-bottom: $black-bis 1px solid;
 }
 
 /* The sidebar menu */
 .left-channelbar {
+  padding: 20px;
   height: calc(
     100% - 50px
   ); /* Full-height: remove this if you want "auto" height */
@@ -80,6 +87,10 @@ $white: #f8f8f2;
   top: 0; /* Stay at the top */
   right: 0px;
   overflow-x: hidden; /* Disable horizontal scroll */
+}
+
+.message-username {
+  padding-right: 1ch;
 }
 
 /* The sidebar menu */
@@ -109,6 +120,24 @@ $white: #f8f8f2;
   overflow-x: hidden; /* Disable horizontal scroll */
 }
 
+.chat-message-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+.chat-messages {
+  flex: 1;
+  height: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.translucent {
+  opacity: 0.5;
+}
+
 .chat-input-wrapper {
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
@@ -117,6 +146,11 @@ $white: #f8f8f2;
   width: 100%;
   height: 100%;
   padding: 10px;
+}
+
+.searchbar-wrapper {
+  position: absolute;
+  right: 0;
 }
 
 .chat-input {
@@ -138,4 +172,24 @@ $white: #f8f8f2;
   padding-left: 0;
   padding-right: 10px;
   outline: none;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: $black-ter;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: $grey-darker;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }

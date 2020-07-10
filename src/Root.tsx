@@ -17,7 +17,10 @@ export class Root extends Component<Props, State> {
   render() {
     return (
       <Switch>
-        <Route path={'/'} render={({ match }) => <Chat match={match} />} />
+        <Route
+          path={'/:resourceType?/:id?'}
+          render={({ match }) => <Chat match={match} />}
+        />
       </Switch>
     );
   }
