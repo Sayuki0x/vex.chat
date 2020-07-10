@@ -1,5 +1,5 @@
 $black: #080808;
-$black-bis: #1E1F1C;
+$black-bis: #1e1f1c;
 $black-ter: #272822;
 $grey-darker: #414339;
 
@@ -14,9 +14,11 @@ $white: #f8f8f2;
 
 @import '../../node_modules/bulma/bulma.sass';
 
- /* The sidebar menu */
- .right-sidebar {
-  height: calc(100% - 50px); /* Full-height: remove this if you want "auto" height */
+/* The sidebar menu */
+.right-sidebar {
+  height: calc(
+    100% - 50px
+  ); /* Full-height: remove this if you want "auto" height */
   height: 100%; /* Full-height: remove this if you want "auto" height */
   width: 250px; /* Set the width of the sidebar */
   position: fixed; /* Fixed Sidebar (stay in place on scroll) */
@@ -27,8 +29,8 @@ $white: #f8f8f2;
   padding-top: 20px;
 }
 
- /* The sidebar menu */
- .left-sidebar {
+/* The sidebar menu */
+.left-sidebar {
   height: 100%; /* Full-height: remove this if you want "auto" height */
   width: 80px; /* Set the width of the sidebar */
   position: fixed; /* Fixed Sidebar (stay in place on scroll) */
@@ -56,10 +58,11 @@ $white: #f8f8f2;
   border-bottom: $black-bis 12px solid;
 }
 
-
 /* The sidebar menu */
- .left-channelbar {
-  height: calc(100% - 50px); /* Full-height: remove this if you want "auto" height */
+.left-channelbar {
+  height: calc(
+    100% - 50px
+  ); /* Full-height: remove this if you want "auto" height */
   width: 263px; /* Set the width of the sidebar */
   position: fixed; /* Fixed Sidebar (stay in place on scroll) */
   z-index: 1; /* Stay on top */
@@ -95,7 +98,9 @@ $white: #f8f8f2;
 /* The sidebar menu */
 .chat-window {
   padding: 20px;
-  height: calc(100% - 50px - 100px); /* Full-height: remove this if you want "auto" height */
+  height: calc(
+    100% - 50px - 100px
+  ); /* Full-height: remove this if you want "auto" height */
   width: calc(100% - 80px - 263px - 250px); /* Set the width of the sidebar */
   position: fixed; /* Fixed Sidebar (stay in place on scroll) */
   z-index: 1; /* Stay on top */
@@ -114,24 +119,23 @@ $white: #f8f8f2;
   padding: 10px;
 }
 
-
 .chat-input {
-	resize: none;
-	border: none;
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	appearance: none;
-	-webkit-box-sizing: border-box;
-	box-sizing: border-box;
+  resize: none;
+  border: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
   font-weight: 400;
   background-color: transparent !important;
   color: $white !important;
-	font-size: 1rem;
-	line-height: 1.375rem;
-	width: 100%;
-	height: 100%;
-	min-height: 44px;
-	color: var(--text-normal);
-	padding-left: 0;
+  font-size: 1rem;
+  line-height: 1.375rem;
+  width: 100%;
+  height: 100%;
+  min-height: 44px;
+  color: var(--text-normal);
+  padding-left: 0;
   padding-right: 10px;
 }
