@@ -15,6 +15,7 @@ import {
   faPoo,
 } from '@fortawesome/free-solid-svg-icons';
 import defaultAvatar from '../images/default_avatar.svg';
+import { MultiSelect } from './Select';
 
 type State = {
   channelList: IChannel[];
@@ -108,7 +109,6 @@ export class Chat extends Component<Props, State> {
   };
 
   chunkPosts = (posts: IChatMessage[]) => {
-    console.log('posts passed in is ', posts);
     const chunked: IChatMessage[][] = [[]];
     let rowCount = 0;
     for (const post of posts) {
@@ -133,7 +133,6 @@ export class Chat extends Component<Props, State> {
         rowCount++;
       }
     }
-    console.log('chunked result is ', chunked);
     return chunked;
   };
 
@@ -156,10 +155,11 @@ export class Chat extends Component<Props, State> {
         <input
           autoFocus
           ref={(ref) => (inputRef = ref)}
-          className={`input is-link`}
+          placeholder={'Enter new nickname...'}
+          className={`input`}
         ></input>
         <div className="modal-bottom-strip has-text-right">
-          <button className="button is-danger" type="submit">
+          <button className="button is-black" type="submit">
             Save
           </button>
         </div>
@@ -246,7 +246,7 @@ export class Chat extends Component<Props, State> {
         >
           <div className="modal-background" onClick={this.closeModal}></div>
           <div className="modal-content">
-            <div className="box has-background-black-bis modal-window">
+            <div className="box has-background-black modal-window">
               {this.state.modalContents && this.state.modalContents}
             </div>
           </div>
@@ -333,7 +333,7 @@ export class Chat extends Component<Props, State> {
                       &nbsp;
                       <label>Private?</label>
                       <div className="modal-bottom-strip has-text-right">
-                        <button className="button is-danger" type="submit">
+                        <button className="button is-black" type="submit">
                           Save
                         </button>
                       </div>
@@ -348,11 +348,11 @@ export class Chat extends Component<Props, State> {
             </p>
             <ul className="menu-list">
               {this.state.channelList.map((channel) => (
-                <div>
+                <div key={'channel-list-' + channel.channelID}>
                   <ContextMenuTrigger
                     id={'channel-list-trigger-' + channel.channelID}
                   >
-                    <li key={'channel-list-' + channel.channelID}>
+                    <li>
                       <Link to={'/channel/' + channel.channelID}>
                         <FontAwesomeIcon
                           icon={channel.public ? faHashtag : faKey}
@@ -367,14 +367,15 @@ export class Chat extends Component<Props, State> {
                         const deleteConfirm = (
                           <p>
                             <div className="has-text-white">
-                              <p className="title has-text-white">Confirm</p>
+                              <p className="has-text-white">CONFIRM</p>
+                              <br />
                               Are you sure you want to delete{' '}
                               <strong>{channel.name}</strong>?
                             </div>
                             <div className="modal-bottom-strip">
                               <div className="buttons is-right">
                                 <button
-                                  className="button is-success"
+                                  className="button is-danger"
                                   onClick={async () => {
                                     this.closeModal();
                                     await client.channels.delete(
@@ -385,7 +386,7 @@ export class Chat extends Component<Props, State> {
                                   Yes
                                 </button>
                                 <button
-                                  className="button is-danger"
+                                  className="button is-black"
                                   onClick={this.closeModal}
                                 >
                                   No
@@ -460,7 +461,33 @@ export class Chat extends Component<Props, State> {
                             Change Nickname
                           </MenuItem>
                         )}
+                        <MenuItem
+                          data={messages[0]}
+                          onClick={(e: any, data: any) => {
+                            const grantForm = (
+                              <div className="large-modal">
+                                <p className="has-text-white">ADD TO CHANNEL</p>
+                                <br />
+                                <MultiSelect />
+                                <div className="modal-bottom-strip">
+                                  <div className="buttons is-right">
+                                    <button
+                                      className="button is-danger"
+                                      onClick={this.closeModal}
+                                    >
+                                      Add
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            );
 
+                            this.openModal(grantForm);
+                          }}
+                        >
+                          Add To Channel
+                        </MenuItem>
+                        <MenuItem divider />
                         <MenuItem
                           data={messages[0]}
                           onClick={(e: any, data: any) => {
@@ -480,7 +507,14 @@ export class Chat extends Component<Props, State> {
                             index.toString()
                           }
                         >
-                          <ReactMarkdown source={message.message} />
+                          {' '}
+                          {message.message.charAt(0) === '>' ? (
+                            <p className="has-text-success">
+                              {message.message}
+                            </p>
+                          ) : (
+                            <ReactMarkdown source={message.message} />
+                          )}
                         </span>
                       ))}
                     </div>
@@ -581,6 +615,14 @@ export class Chat extends Component<Props, State> {
                           }}
                         >
                           View Profile
+                        </MenuItem>
+                        <MenuItem
+                          data={user}
+                          onClick={(e: any, data: any) => {
+                            this.openModal(userProfile(user.userID));
+                          }}
+                        >
+                          Add To Channel
                         </MenuItem>
                       </ContextMenu>
                     </div>

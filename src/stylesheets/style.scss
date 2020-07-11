@@ -6,7 +6,8 @@ $grey-darker: #414339;
 $red: #f92672;
 $green: #a6e22e;
 $yellow: #f4bf75;
-$blue: #66d9ef;
+$blue: $red;
+$blue_: #66d9ef;
 $purple: #ae81ff;
 $cyan: #ae81ff;
 $turquoise: #2aa198;
@@ -18,14 +19,38 @@ $menu-item-hover-color: $white;
 
 @import '../../node_modules/bulma/bulma.sass';
 
+body {
+  color: $white;
+}
+
+::placeholder {
+  /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: $grey-darker !important;
+  opacity: 1; /* Firefox */
+}
+
+::-ms-input-placeholder {
+  /* Microsoft Edge */
+  color: $grey-darker !important;
+  opacity: 1; /* Firefox */
+}
+
+label {
+  color: $white;
+}
+
 .has-text-brown {
   color: $brown;
+}
+
+.large-modal {
+  height: 500px;
 }
 
 .media + .media {
   border-top: none;
   margin-top: 1rem;
-  padding-top: 1rem;
+  padding-top: 0.5rem;
 }
 
 strong {
@@ -278,4 +303,58 @@ input {
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+.channel-finder__control {
+  background-color: transparent !important;
+}
+
+.channel-finder__control--is-focused {
+  background-color: transparent !important;
+  border-color: $red !important;
+  box-shadow: 0 0 0 1px $red !important;
+}
+
+.channel-finder {
+  background-color: transparent !important;
+}
+
+.channel-finder__value-container {
+  background-color: transparent !important;
+}
+
+.channel-finder__indicators {
+  background-color: transparent !important;
+}
+
+.channel-finder__menu {
+  background-color: $black !important;
+}
+
+.channel-finder__menu-list {
+  background-color: transparent !important;
+}
+
+.channel-finder__option {
+  background-color: transparent !important;
+  color: $white !important;
+}
+
+.channel-finder__option:hover {
+  background-color: $black-bis !important;
+}
+
+.channel-finder__multi-value {
+  background-color: $black-bis !important;
+  color: $white;
+}
+
+.channel-finder__multi-value__label {
+  color: $white !important;
+  font-weight: bold;
+}
+
+.channel-finder__multi-value__remove:hover {
+  color: $white !important;
+  background-color: $red !important;
 }
