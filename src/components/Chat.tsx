@@ -6,6 +6,15 @@ import { Link } from 'react-router-dom';
 import { getUserColor, getUserHexTag } from '../utils/getUserColor';
 import ReactMarkdown from 'react-markdown';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faPlus,
+  faHashtag,
+  faKey,
+  faCrown,
+  faPoo,
+} from '@fortawesome/free-solid-svg-icons';
+import defaultAvatar from '../images/default_avatar.svg';
 
 type State = {
   channelList: IChannel[];
@@ -99,6 +108,7 @@ export class Chat extends Component<Props, State> {
   };
 
   chunkPosts = (posts: IChatMessage[]) => {
+    console.log('posts passed in is ', posts);
     const chunked: IChatMessage[][] = [[]];
     let rowCount = 0;
     for (const post of posts) {
@@ -107,6 +117,7 @@ export class Chat extends Component<Props, State> {
       }
       if (chunked[rowCount].length === 0) {
         chunked[rowCount].push(post);
+        continue;
       }
       if (
         chunked[rowCount][chunked[rowCount].length - 1].userID ===
@@ -115,12 +126,14 @@ export class Chat extends Component<Props, State> {
           post.username
       ) {
         chunked[rowCount].push(post);
+        continue;
       } else {
         chunked.push([]);
         chunked[rowCount + 1].push(post);
         rowCount++;
       }
     }
+    console.log('chunked result is ', chunked);
     return chunked;
   };
 
@@ -143,7 +156,7 @@ export class Chat extends Component<Props, State> {
         <input
           autoFocus
           ref={(ref) => (inputRef = ref)}
-          className={`input is-danger`}
+          className={`input is-link`}
         ></input>
         <div className="modal-bottom-strip has-text-right">
           <button className="button is-danger" type="submit">
@@ -170,6 +183,50 @@ export class Chat extends Component<Props, State> {
   }
 
   render() {
+    const userProfile = (userID: string) => (
+      <article className="media">
+        <figure className="media-left">
+          <p className="image is-64x64">
+            <img
+              src={defaultAvatar}
+              alt="user avatar"
+              className="is-rounded"
+              style={{
+                backgroundColor: getUserColor(userID),
+              }}
+            />
+          </p>
+        </figure>
+        <div className="media-content">
+          <div className="content">
+            <p>
+              <strong>{userID}</strong>
+            </p>
+          </div>
+          <nav className="level is-mobile">
+            <div className="level-left">
+              <a className="level-item">
+                <span className="icon is-small">
+                  <i className="fas fa-reply"></i>
+                </span>
+              </a>
+              <a className="level-item">
+                <span className="icon is-small">
+                  <i className="fas fa-retweet"></i>
+                </span>
+              </a>
+              <a className="level-item">
+                <span className="icon is-small">
+                  <i className="fas fa-heart"></i>
+                </span>
+              </a>
+            </div>
+          </nav>
+        </div>
+        <div className="media-right"></div>
+      </article>
+    );
+
     const chunkedArray = this.state.chatHistory[this.props.match.params.id]
       ? this.chunkPosts(this.state.chatHistory[this.props.match.params.id])
       : [[]];
@@ -189,7 +246,7 @@ export class Chat extends Component<Props, State> {
         >
           <div className="modal-background" onClick={this.closeModal}></div>
           <div className="modal-content">
-            <div className="box has-background-black-bis">
+            <div className="box has-background-black-bis modal-window">
               {this.state.modalContents && this.state.modalContents}
             </div>
           </div>
@@ -218,7 +275,10 @@ export class Chat extends Component<Props, State> {
                 if (channel.channelID === this.props.match.params.id) {
                   return (
                     <span key={'channel-title-' + channel.channelID}>
-                      #{channel.name}
+                      <FontAwesomeIcon
+                        icon={channel.public ? faHashtag : faKey}
+                      />
+                      &nbsp;&nbsp;{channel.name}
                     </span>
                   );
                 } else {
@@ -230,14 +290,119 @@ export class Chat extends Component<Props, State> {
         </div>
         <div className="left-channelbar has-background-black-bis">
           <aside className="menu">
-            <p className="menu-label">Channels</p>
+            <p className="menu-label">
+              <span className="menu-title-wrapper">Channels</span>
+              <span
+                className="menu-button-wrapper"
+                onClick={() => {
+                  let inputRef: any = React.createRef();
+                  let privateCheckRef: any = React.createRef();
+
+                  const newChannelForm = (
+                    <form
+                      onSubmit={async (event) => {
+                        event.preventDefault();
+                        if (inputRef.value === '') {
+                          return;
+                        }
+                        this.closeModal();
+
+                        console.log(privateCheckRef.checked);
+
+                        const channel = await client.channels.create(
+                          inputRef.value,
+                          privateCheckRef.checked
+                        );
+                        await client.channels.join(channel.channelID);
+                      }}
+                    >
+                      <p className="has-text-white">CREATE CHANNEL</p>
+                      <br />
+                      <label>Channel Name</label>
+                      <input
+                        autoFocus
+                        ref={(ref) => (inputRef = ref)}
+                        className={`input`}
+                      ></input>
+                      <br />
+                      <br />
+                      <input
+                        type="checkbox"
+                        ref={(ref) => (privateCheckRef = ref)}
+                      ></input>
+                      &nbsp;
+                      <label>Private?</label>
+                      <div className="modal-bottom-strip has-text-right">
+                        <button className="button is-danger" type="submit">
+                          Save
+                        </button>
+                      </div>
+                    </form>
+                  );
+
+                  this.openModal(newChannelForm);
+                }}
+              >
+                <FontAwesomeIcon icon={faPlus} />
+              </span>
+            </p>
             <ul className="menu-list">
               {this.state.channelList.map((channel) => (
-                <li key={'channel-list-' + channel.channelID}>
-                  <Link to={'/channel/' + channel.channelID}>
-                    #<strong> {channel.name}</strong>
-                  </Link>
-                </li>
+                <div>
+                  <ContextMenuTrigger
+                    id={'channel-list-trigger-' + channel.channelID}
+                  >
+                    <li key={'channel-list-' + channel.channelID}>
+                      <Link to={'/channel/' + channel.channelID}>
+                        <FontAwesomeIcon
+                          icon={channel.public ? faHashtag : faKey}
+                        />
+                        &nbsp;&nbsp;<strong>{channel.name}</strong>
+                      </Link>
+                    </li>
+                  </ContextMenuTrigger>
+                  <ContextMenu id={'channel-list-trigger-' + channel.channelID}>
+                    <MenuItem
+                      onClick={(event, data) => {
+                        const deleteConfirm = (
+                          <p>
+                            <div className="has-text-white">
+                              <p className="title has-text-white">Confirm</p>
+                              Are you sure you want to delete{' '}
+                              <strong>{channel.name}</strong>?
+                            </div>
+                            <div className="modal-bottom-strip">
+                              <div className="buttons is-right">
+                                <button
+                                  className="button is-success"
+                                  onClick={async () => {
+                                    this.closeModal();
+                                    await client.channels.delete(
+                                      channel.channelID
+                                    );
+                                  }}
+                                >
+                                  Yes
+                                </button>
+                                <button
+                                  className="button is-danger"
+                                  onClick={this.closeModal}
+                                >
+                                  No
+                                </button>
+                              </div>
+                            </div>
+                          </p>
+                        );
+
+                        this.openModal(deleteConfirm);
+                      }}
+                      data={channel}
+                    >
+                      Delete Channel
+                    </MenuItem>
+                  </ContextMenu>
+                </div>
               ))}
             </ul>
           </aside>
@@ -254,9 +419,12 @@ export class Chat extends Component<Props, State> {
                   <figure className="media-left">
                     <p className="image is-48x48">
                       <img
-                        src="https://bulma.io/images/placeholders/128x128.png"
+                        src={defaultAvatar}
                         className="is-rounded"
                         alt="user avatar"
+                        style={{
+                          backgroundColor: getUserColor(messages[0].userID),
+                        }}
                       />
                     </p>
                   </figure>
@@ -293,7 +461,12 @@ export class Chat extends Component<Props, State> {
                           </MenuItem>
                         )}
 
-                        <MenuItem data={messages[0]} onClick={() => {}}>
+                        <MenuItem
+                          data={messages[0]}
+                          onClick={(e: any, data: any) => {
+                            this.openModal(userProfile(messages[0].userID));
+                          }}
+                        >
                           View Profile
                         </MenuItem>
                       </ContextMenu>
@@ -335,6 +508,11 @@ export class Chat extends Component<Props, State> {
               onKeyPress={async (event) => {
                 if (event.key === 'Enter') {
                   event.preventDefault();
+
+                  if (this.state.inputValue === '') {
+                    return;
+                  }
+
                   await client.messages.send(
                     this.props.match.params.id,
                     this.state.inputValue
@@ -361,6 +539,21 @@ export class Chat extends Component<Props, State> {
                         <a>
                           <li>
                             {' '}
+                            {user.powerLevel === 100 && (
+                              <span className="role-icon has-text-warning">
+                                <FontAwesomeIcon icon={faCrown} />
+                              </span>
+                            )}
+                            {user.powerLevel >= 50 && user.powerLevel < 100 && (
+                              <span className="role-icon has-text-grey">
+                                <FontAwesomeIcon icon={faCrown} />
+                              </span>
+                            )}
+                            {user.powerLevel >= 25 && user.powerLevel < 50 && (
+                              <span className="role-icon has-text-brown">
+                                <FontAwesomeIcon icon={faPoo} />
+                              </span>
+                            )}
                             <span
                               className="message-username has-text-weight-bold"
                               style={{
@@ -381,7 +574,12 @@ export class Chat extends Component<Props, State> {
                             Change Nickname
                           </MenuItem>
                         )}
-                        <MenuItem data={user} onClick={() => {}}>
+                        <MenuItem
+                          data={user}
+                          onClick={(e: any, data: any) => {
+                            this.openModal(userProfile(user.userID));
+                          }}
+                        >
                           View Profile
                         </MenuItem>
                       </ContextMenu>

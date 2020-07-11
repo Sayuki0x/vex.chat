@@ -12,7 +12,6 @@ client.on('ready', async () => {
     await client.register();
     localStorage.setItem('pk', Utils.toHexString(keyring.getPriv()));
   }
-
   await client.auth();
 });
 

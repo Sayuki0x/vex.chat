@@ -11,11 +11,16 @@ $purple: #ae81ff;
 $cyan: #ae81ff;
 $turquoise: #2aa198;
 $white: #f8f8f2;
+$brown: #7b3f00;
 
 $menu-item-hover-background-color: $black-ter;
 $menu-item-hover-color: $white;
 
 @import '../../node_modules/bulma/bulma.sass';
+
+.has-text-brown {
+  color: $brown;
+}
 
 .media + .media {
   border-top: none;
@@ -47,6 +52,21 @@ input {
   padding-top: 10px;
 }
 
+.modal-window {
+  padding: 20px;
+}
+
+.menu-button-wrapper {
+  font-size: 18px;
+  float: right;
+  margin-top: -5px;
+}
+
+.menu-button-wrapper:hover {
+  color: $light;
+  cursor: pointer;
+}
+
 .react-contextmenu-wrapper {
   cursor: pointer;
 }
@@ -55,7 +75,7 @@ input {
   color: $white;
   background-color: $black-bis;
   padding: 10px;
-  z-index: 4;
+  z-index: 10;
   width: 180px;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
@@ -149,6 +169,10 @@ input {
   top: 0; /* Stay at the top */
   right: 0px;
   overflow-x: hidden; /* Disable horizontal scroll */
+}
+
+.role-icon {
+  padding-right: 1ch;
 }
 
 .message-username {
