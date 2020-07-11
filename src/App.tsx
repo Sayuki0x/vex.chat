@@ -5,7 +5,14 @@ import { Root } from './Root';
 import { KeyRing, Client, Utils } from 'libvex';
 
 export const keyring = new KeyRing(':memory:', localStorage.getItem('pk'));
-export const client = new Client('localhost:8000', keyring, null, false);
+export const client = new Client(
+  process.env.REACT_APP_VEX_SERVER!,
+  keyring,
+  null,
+  process.env.REACT_APP_VEX_SERVER
+    ? process.env.REACT_APP_VEX_SERVER === 'true'
+    : true
+);
 
 client.on('ready', async () => {
   if (!localStorage.getItem('pk')) {
