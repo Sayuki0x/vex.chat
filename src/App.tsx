@@ -9,8 +9,8 @@ export const client = new Client(
   process.env.REACT_APP_VEX_SERVER!,
   keyring,
   null,
-  process.env.REACT_APP_VEX_SERVER
-    ? process.env.REACT_APP_VEX_SERVER === 'true'
+  process.env.REACT_APP_SSL_ENABLED
+    ? process.env.REACT_APP_SSL_ENABLED === 'true'
     : true
 );
 
