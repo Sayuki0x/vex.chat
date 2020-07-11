@@ -18,6 +18,13 @@ import {
 import defaultAvatar from '../images/default_avatar.svg';
 import { MultiSelect } from './Select';
 
+const uniqueArray = (arr: any[]) => {return arr.filter((thing: any, index: number) => {
+  const _thing = JSON.stringify(thing);
+  return index === arr.findIndex(obj => {
+    return JSON.stringify(obj) === _thing;
+  });
+});}
+
 type State = {
   channelList: IChannel[];
   clientInfo: IClientInfo;
@@ -782,9 +789,10 @@ export class Chat extends Component<Props, State> {
             <p className="menu-label">Online</p>
             <ul className="menu-list">
               {this.state.onlineLists[this.props.match.params.id] &&
-                this.state.onlineLists[this.props.match.params.id].map(
-                  (user) => (
-                    <div key={'online-user-' + user.userID}>
+                uniqueArray(this.state.onlineLists[this.props.match.params.id]).map(
+                  (user) => 
+                   { 
+                     return <div key={'online-user-' + user.userID}>
                       <ContextMenuTrigger
                         id={'online-user-trigger-' + user.userID}
                       >
@@ -835,7 +843,7 @@ export class Chat extends Component<Props, State> {
 
                       </ContextMenu>
                     </div>
-                  )
+                  }
                 )}
             </ul>
           </aside>
