@@ -126,6 +126,11 @@ export class Chat extends Component<Props, State> {
         chatHistory[message.channelID] = [];
       }
       chatHistory[message.channelID].push(message);
+
+      if (chatHistory[message.channelID].length > 500) {
+        chatHistory[message.channelID].shift();
+      }
+
       this.setState({
         chatHistory,
       });
@@ -218,8 +223,6 @@ export class Chat extends Component<Props, State> {
 
 
   render() {
-
-
     const chunkedArray = this.state.chatHistory[this.props.match.params.id]
       ? this.chunkPosts(this.state.chatHistory[this.props.match.params.id])
       : [[]];
