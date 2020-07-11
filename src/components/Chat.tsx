@@ -25,10 +25,35 @@ type State = {
   inputValue: string;
   modalIsActive: boolean;
   modalContents: JSX.Element;
+  joinedRooms: string[];
 };
 
 type Props = {
   match: any;
+};
+
+const getUserIcon = (powerLevel: number) => {
+  if (powerLevel === 100)
+    return (
+      <span className="role-icon has-text-warning">
+        <FontAwesomeIcon icon={faCrown} />
+      </span>
+    );
+
+  if (powerLevel >= 50 && powerLevel < 100)
+    return (
+      <span className="role-icon has-text-grey">
+        <FontAwesomeIcon icon={faCrown} />
+      </span>
+    );
+
+  if (powerLevel >= 25 && powerLevel < 50)
+    return (
+      <span className="role-icon has-text-brown">
+        <FontAwesomeIcon icon={faPoo} />
+      </span>
+    );
+  return null;
 };
 
 export class Chat extends Component<Props, State> {
@@ -44,6 +69,7 @@ export class Chat extends Component<Props, State> {
       onlineLists: {},
       modalIsActive: false,
       modalContents: <span />,
+      joinedRooms: [],
     };
 
     this.scrollToBottom = this.scrollToBottom.bind(this);
@@ -61,6 +87,11 @@ export class Chat extends Component<Props, State> {
 
       for (const channel of channelList) {
         await client.channels.join(channel.channelID);
+        const { joinedRooms } = this.state;
+        joinedRooms.push(channel.channelID);
+        this.setState({
+          joinedRooms,
+        });
         const history = await client.messages.retrieve(channel.channelID);
         const { chatHistory } = this.state;
         chatHistory[channel.channelID] = history;
@@ -76,6 +107,23 @@ export class Chat extends Component<Props, State> {
       this.setState({
         channelList,
       });
+
+      for (const channel of channelList) {
+        if (!this.state.joinedRooms.includes(channel.channelID)) {
+          await client.channels.join(channel.channelID);
+          const { joinedRooms } = this.state;
+          joinedRooms.push(channel.channelID);
+          this.setState({
+            joinedRooms,
+          });
+          const history = await client.messages.retrieve(channel.channelID);
+          const { chatHistory } = this.state;
+          chatHistory[channel.channelID] = history;
+          this.setState({
+            chatHistory,
+          });
+        }
+      }
     });
 
     client.on('onlineList', async (onlineList, channelID) => {
@@ -182,50 +230,99 @@ export class Chat extends Component<Props, State> {
     });
   }
 
+  downloadTxtFile = (s: string, filename: string) => {
+    const element = document.createElement('a');
+    const file = new Blob([s], { type: 'text/plain' });
+    element.href = URL.createObjectURL(file);
+    element.download = filename;
+    document.body.appendChild(element); // Required for this to work in FireFox
+    element.click();
+  };
+
   render() {
-    const userProfile = (userID: string) => (
-      <article className="media">
-        <figure className="media-left">
-          <p className="image is-64x64">
-            <img
-              src={defaultAvatar}
-              alt="user avatar"
-              className="is-rounded"
-              style={{
-                backgroundColor: getUserColor(userID),
-              }}
-            />
-          </p>
-        </figure>
-        <div className="media-content">
-          <div className="content">
-            <p>
-              <strong>{userID}</strong>
+    const userProfile = async (userID: string) => {
+      const userDetails = await client.users.retrieve(userID);
+
+      return (
+        <article className="media profile-modal has-background-black">
+          <figure className="media-left">
+            <p className="image is-64x64">
+              <img
+                src={defaultAvatar}
+                alt="user avatar"
+                className="is-rounded"
+                style={{
+                  backgroundColor: getUserColor(userID),
+                }}
+              />
             </p>
-          </div>
-          <nav className="level is-mobile">
-            <div className="level-left">
-              <a className="level-item">
-                <span className="icon is-small">
-                  <i className="fas fa-reply"></i>
+          </figure>
+          <div className="media-content">
+            <div className="content">
+              <p
+                className="has-text-weight-bold is-size-3"
+                style={{ color: getUserColor(userDetails.userID) }}
+              >
+                {userDetails.username}
+                <span className="translucent">
+                  #{getUserHexTag(userDetails.userID)}
                 </span>
-              </a>
-              <a className="level-item">
-                <span className="icon is-small">
-                  <i className="fas fa-retweet"></i>
-                </span>
-              </a>
-              <a className="level-item">
-                <span className="icon is-small">
-                  <i className="fas fa-heart"></i>
-                </span>
-              </a>
+                &nbsp;&nbsp;
+                {getUserIcon(userDetails.powerLevel)}
+              </p>
+              <p className="has-text-white is-family-monospace is-size-7">
+                Public Key <br />
+                {userDetails.pubkey}
+              </p>
+
+              <p className="has-text-white is-family-monospace is-size-7">
+                User ID <br />
+                {userDetails.userID}
+              </p>
+
+              <p className="has-text-white is-family-monospace is-size-7">
+                Power Level <br />
+                {userDetails.powerLevel}
+              </p>
+
+              {userDetails.userID === client.info().client!.userID && (
+                <button
+                  className="button is-danger is-small"
+                  onClick={() => {
+                    this.downloadTxtFile(
+                      localStorage.getItem('pk')!,
+                      'key.priv'
+                    );
+                  }}
+                >
+                  Save Private Key
+                </button>
+              )}
             </div>
-          </nav>
-        </div>
-        <div className="media-right"></div>
-      </article>
-    );
+            <nav className="level is-mobile">
+              <div className="level-left">
+                <a className="level-item">
+                  <span className="icon is-small">
+                    <i className="fas fa-reply"></i>
+                  </span>
+                </a>
+                <a className="level-item">
+                  <span className="icon is-small">
+                    <i className="fas fa-retweet"></i>
+                  </span>
+                </a>
+                <a className="level-item">
+                  <span className="icon is-small">
+                    <i className="fas fa-heart"></i>
+                  </span>
+                </a>
+              </div>
+            </nav>
+          </div>
+          <div className="media-right"></div>
+        </article>
+      );
+    };
 
     const chunkedArray = this.state.chatHistory[this.props.match.params.id]
       ? this.chunkPosts(this.state.chatHistory[this.props.match.params.id])
@@ -307,8 +404,6 @@ export class Chat extends Component<Props, State> {
                         }
                         this.closeModal();
 
-                        console.log(privateCheckRef.checked);
-
                         const channel = await client.channels.create(
                           inputRef.value,
                           privateCheckRef.checked
@@ -365,9 +460,9 @@ export class Chat extends Component<Props, State> {
                     <MenuItem
                       onClick={(event, data) => {
                         const deleteConfirm = (
-                          <p>
+                          <div>
                             <div className="has-text-white">
-                              <p className="has-text-white">CONFIRM</p>
+                              <span className="has-text-white">CONFIRM</span>
                               <br />
                               Are you sure you want to delete{' '}
                               <strong>{channel.name}</strong>?
@@ -393,7 +488,7 @@ export class Chat extends Component<Props, State> {
                                 </button>
                               </div>
                             </div>
-                          </p>
+                          </div>
                         );
 
                         this.openModal(deleteConfirm);
@@ -464,24 +559,44 @@ export class Chat extends Component<Props, State> {
                         <MenuItem
                           data={messages[0]}
                           onClick={(e: any, data: any) => {
+                            let selectedValues: any[] = [];
                             const grantForm = (
-                              <div className="large-modal">
+                              <form
+                                className="large-modal"
+                                onSubmit={async (event) => {
+                                  event.preventDefault();
+                                  // this.closeModal();
+                                  for (const selection of selectedValues) {
+                                    console.log(selection);
+                                    await client.permissions.create(
+                                      messages[0].userID,
+                                      selection.value
+                                    );
+                                    console.log('it worked');
+                                  }
+                                }}
+                              >
                                 <p className="has-text-white">ADD TO CHANNEL</p>
                                 <br />
-                                <MultiSelect />
+                                <MultiSelect
+                                  onChange={(values: any[], action: any) => {
+                                    selectedValues = values;
+
+                                    console.log(selectedValues);
+                                  }}
+                                />
                                 <div className="modal-bottom-strip">
                                   <div className="buttons is-right">
                                     <button
                                       className="button is-danger"
-                                      onClick={this.closeModal}
+                                      type="submit"
                                     >
                                       Add
                                     </button>
                                   </div>
                                 </div>
-                              </div>
+                              </form>
                             );
-
                             this.openModal(grantForm);
                           }}
                         >
@@ -490,8 +605,10 @@ export class Chat extends Component<Props, State> {
                         <MenuItem divider />
                         <MenuItem
                           data={messages[0]}
-                          onClick={(e: any, data: any) => {
-                            this.openModal(userProfile(messages[0].userID));
+                          onClick={async (e: any, data: any) => {
+                            this.openModal(
+                              await userProfile(messages[0].userID)
+                            );
                           }}
                         >
                           View Profile
@@ -573,21 +690,7 @@ export class Chat extends Component<Props, State> {
                         <a>
                           <li>
                             {' '}
-                            {user.powerLevel === 100 && (
-                              <span className="role-icon has-text-warning">
-                                <FontAwesomeIcon icon={faCrown} />
-                              </span>
-                            )}
-                            {user.powerLevel >= 50 && user.powerLevel < 100 && (
-                              <span className="role-icon has-text-grey">
-                                <FontAwesomeIcon icon={faCrown} />
-                              </span>
-                            )}
-                            {user.powerLevel >= 25 && user.powerLevel < 50 && (
-                              <span className="role-icon has-text-brown">
-                                <FontAwesomeIcon icon={faPoo} />
-                              </span>
-                            )}
+                            {getUserIcon(user.powerLevel)}
                             <span
                               className="message-username has-text-weight-bold"
                               style={{
@@ -610,16 +713,16 @@ export class Chat extends Component<Props, State> {
                         )}
                         <MenuItem
                           data={user}
-                          onClick={(e: any, data: any) => {
-                            this.openModal(userProfile(user.userID));
+                          onClick={async (e: any, data: any) => {
+                            this.openModal(await userProfile(user.userID));
                           }}
                         >
                           View Profile
                         </MenuItem>
                         <MenuItem
                           data={user}
-                          onClick={(e: any, data: any) => {
-                            this.openModal(userProfile(user.userID));
+                          onClick={async (e: any, data: any) => {
+                            this.openModal(await userProfile(user.userID));
                           }}
                         >
                           Add To Channel

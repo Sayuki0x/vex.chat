@@ -12,7 +12,9 @@ type SelectOptions = {
   value: string;
 };
 
-type Props = {};
+type Props = {
+  onChange: any;
+};
 
 const filterChannels = (inputValue: string, channels: SelectOptions[]) => {
   return channels.filter((i) =>
@@ -51,6 +53,7 @@ export class MultiSelect extends Component<Props, State> {
         isMulti
         cacheOptions
         defaultOptions
+        onChange={this.props.onChange}
         placeholder="Enter channel name..."
         className="channel-finder"
         classNamePrefix="channel-finder"

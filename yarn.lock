@@ -7047,10 +7047,10 @@ levn@^0.3.0, levn@~0.3.0:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
 
-libvex@^2.3.1:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/libvex/-/libvex-2.3.1.tgz#e8d9d7ead74120f0d5ae8e4b703207c7f541b5ff"
-  integrity sha512-qEcSxeZ1tOk7yPG0gxoMUl9etXzGG0tU+Sftr+lLFMb5QwJQLJ5z9621i+1d6cXrEDh4O7ep9TAf1mNg/HZ9lg==
+libvex@^2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/libvex/-/libvex-2.4.0.tgz#22fb0b7e0dd5d73fc611d612b0fc5ba1186c4b7e"
+  integrity sha512-VhvieDgkD66KpX3lkf77fVPgqFgrmPRjbvqPS3tI90DKsosOfJnhrZs4qSIsxywyfYcbmEjwTBNVdVK9CUzgdQ==
   dependencies:
     "@types/node" "^14.0.14"
     "@types/uuid" "^8.0.0"
