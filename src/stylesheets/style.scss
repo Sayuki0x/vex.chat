@@ -124,6 +124,11 @@ input {
   background-color: $black-ter;
 }
 
+.react-contextmenu-item--divider:hover {
+  padding: 2px;
+  background-color: $black-ter;
+}
+
 /* The sidebar menu */
 .right-sidebar {
   padding: 20px;
