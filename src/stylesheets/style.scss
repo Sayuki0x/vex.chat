@@ -213,14 +213,13 @@ input {
 }
 
 .swipe-anchor-right {
+  background-color: transparent;
   position: absolute;
   height: calc(100% - 50px);
   bottom: 0;
-  height: 100%;
   width: 25px;
   right: 0;
   z-index: 222;
-  background-color: transparent;
 }
 
 @media screen and (max-width: $tablet) {
