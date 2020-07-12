@@ -281,24 +281,36 @@ export class Chat extends Component<Props, State> {
   }
 
   closeRightBar() {
+    if (this.state.viewportWidth > 1024) {
+      return;
+    }
     this.setState({
       rightBarOpen: false,
     });
   }
 
   openRightBar() {
+    if (this.state.viewportWidth > 1024) {
+      return;
+    }
     this.setState({
       rightBarOpen: true,
     });
   }
 
   closeLeftBar() {
+    if (this.state.viewportWidth > 769) {
+      return;
+    }
     this.setState({
       leftBarOpen: false,
     });
   }
 
   openLeftBar() {
+    if (this.state.viewportWidth > 769) {
+      return;
+    }
     this.setState({
       leftBarOpen: true,
     });
@@ -331,9 +343,7 @@ export class Chat extends Component<Props, State> {
 
         <Swipeable
           onSwipedLeft={(eventData) => {
-            if (this.state.viewportWidth > 1024) {
-              return;
-            }
+
             this.openRightBar();
           }}
         >
@@ -395,9 +405,6 @@ export class Chat extends Component<Props, State> {
         </div>
         <Swipeable
           onSwipedLeft={(eventData) => {
-            if (this.state.viewportWidth > 769) {
-              return;
-            }
             this.closeLeftBar();
           }}
         >
@@ -672,6 +679,7 @@ export class Chat extends Component<Props, State> {
                       <span
                         className="user-bar-cog-wrapper"
                         onClick={async () => {
+                          this.closeLeftBar();
                           this.openModal(
                             await userProfile(client.info().client!.userID)
                           );
@@ -866,9 +874,6 @@ export class Chat extends Component<Props, State> {
         </div>
         <Swipeable
           onSwipedRight={(eventData) => {
-            if (this.state.viewportWidth > 1024) {
-              return;
-            }
             this.closeRightBar();
           }}
         >
