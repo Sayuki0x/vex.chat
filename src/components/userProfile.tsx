@@ -108,8 +108,12 @@ export const userProfile = async (userID: string) => {
                   onChange={(event) => {
                     if (event.target.files) {
                       if (event.target.files[0].size !== 128) {
-                        console.warn("File is not the correct size for private key (expected size 128, received size " + event.target.files[0].size.toString() + ")")
-                        return
+                        console.warn(
+                          'File is not the correct size for private key (expected size 128, received size ' +
+                            event.target.files[0].size.toString() +
+                            ')'
+                        );
+                        return;
                       }
                       const reader = new FileReader();
                       reader.onload = (event) => {

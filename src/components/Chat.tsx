@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { getUserColor, getUserHexTag } from '../utils/getUserColor';
 import ReactMarkdown from 'react-markdown';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
+import { Swipeable } from 'react-swipeable';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faPlus,
@@ -39,6 +40,11 @@ type State = {
   modalIsActive: boolean;
   modalContents: JSX.Element;
   joinedRooms: string[];
+  viewportWidth: number;
+  viewportHeight: number;
+  widthHistory: number[];
+  leftBarOpen: boolean;
+  rightBarOpen: boolean;
 };
 
 type Props = {
@@ -59,15 +65,63 @@ export class Chat extends Component<Props, State> {
       modalIsActive: false,
       modalContents: <span />,
       joinedRooms: [],
+      viewportWidth: window.innerWidth,
+      viewportHeight: window.innerHeight,
+      widthHistory: [window.innerWidth],
+      leftBarOpen: window.innerWidth > 769,
+      rightBarOpen: window.innerWidth > 1024,
     };
 
     this.scrollToBottom = this.scrollToBottom.bind(this);
     this.changeNickname = this.changeNickname.bind(this);
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
+    this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
+    this.openRightBar = this.openRightBar.bind(this);
+    this.closeRightBar = this.closeRightBar.bind(this);
+    this.openLeftBar = this.openLeftBar.bind(this);
+    this.closeLeftBar = this.closeLeftBar.bind(this);
+  }
+
+  updateWindowDimensions() {
+    const { innerWidth, innerHeight } = window;
+    const { widthHistory } = this.state;
+
+    // leftBarOpen: window.innerWidth > 769,
+    // rightBarOpen: window.innerWidth > 1024,
+
+    if (widthHistory[0] <= 769 && innerWidth > 769) {
+      this.openLeftBar();
+    }
+
+    if (widthHistory[0] >= 769 && innerWidth < 769) {
+      this.closeLeftBar();
+    }
+
+    if (widthHistory[0] <= 1024 && innerWidth > 1024) {
+      this.openRightBar();
+    }
+
+    if (widthHistory[0] >= 1024 && innerWidth < 1024) {
+      this.closeRightBar();
+    }
+
+    console.log(widthHistory[0], innerWidth);
+
+    widthHistory.unshift(innerWidth);
+    if (widthHistory.length > 100) {
+      widthHistory.pop();
+    }
+
+    this.setState({
+      viewportWidth: innerWidth,
+      viewportHeight: innerHeight,
+      widthHistory,
+    });
   }
 
   componentDidMount() {
+    window.addEventListener('resize', this.updateWindowDimensions);
     client.on('authed', async () => {
       const channelList = await client.channels.retrieve();
       this.setState({
@@ -140,6 +194,10 @@ export class Chat extends Component<Props, State> {
       });
       this.scrollToBottom();
     });
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.updateWindowDimensions);
   }
 
   componentDidUpdate() {
@@ -224,6 +282,30 @@ export class Chat extends Component<Props, State> {
     });
   }
 
+  closeRightBar() {
+    this.setState({
+      rightBarOpen: false,
+    });
+  }
+
+  openRightBar() {
+    this.setState({
+      rightBarOpen: true,
+    });
+  }
+
+  closeLeftBar() {
+    this.setState({
+      leftBarOpen: false,
+    });
+  }
+
+  openLeftBar() {
+    this.setState({
+      leftBarOpen: true,
+    });
+  }
+
   render() {
     const chunkedArray = this.state.chatHistory[this.props.match.params.id]
       ? this.chunkPosts(this.state.chatHistory[this.props.match.params.id])
@@ -237,6 +319,30 @@ export class Chat extends Component<Props, State> {
           }
         }}
       >
+        <Swipeable
+          onSwipedRight={(eventData) => {
+            if (this.state.viewportWidth > 769) {
+              return;
+            }
+            this.openLeftBar();
+          }}
+        >
+          {' '}
+          <div className="swipe-anchor-left" />
+        </Swipeable>
+
+        <Swipeable
+          onSwipedLeft={(eventData) => {
+            if (this.state.viewportWidth > 1024) {
+              return;
+            }
+            this.openRightBar();
+          }}
+        >
+          {' '}
+          <div className="swipe-anchor-right" />
+        </Swipeable>
+
         <div
           className={`modal ${
             this.state.modalIsActive ? 'is-active' : ''
@@ -259,7 +365,10 @@ export class Chat extends Component<Props, State> {
           />
         </div>
 
-        <div className="left-sidebar has-background-black-ter"></div>
+        <div
+          id="serverBar"
+          className="left-sidebar has-background-black-ter"
+        ></div>
         <div className="top-bar">
           <div className="top-bar-left has-background-black-bis">
             <h1 className="title is-size-4 has-text-white">
@@ -286,284 +395,300 @@ export class Chat extends Component<Props, State> {
             </h1>
           </div>
         </div>
-        <div className="left-channelbar has-background-black-bis">
-          <aside className="menu">
-            <p className="menu-label">
-              <span className="menu-title-wrapper">Channels</span>
-              {client.info().client &&
-                client.info().client!.powerLevel >
-                  client.info().powerLevels.create && (
-                  <span
-                    className="menu-button-wrapper"
-                    onClick={() => {
-                      let inputRef: any = React.createRef();
-                      let privateCheckRef: any = React.createRef();
+        <Swipeable
+          onSwipedLeft={(eventData) => {
+            if (this.state.viewportWidth > 769) {
+              return;
+            }
+            this.closeLeftBar();
+          }}
+        >
+          <div
+            id="channelBar"
+            className={`left-channelbar has-background-black-bis ${
+              this.state.leftBarOpen ? '' : 'hidden'
+            }`}
+          >
+            <aside className="menu">
+              <p className="menu-label">
+                <span className="menu-title-wrapper">Channels</span>
+                {client.info().client &&
+                  client.info().client!.powerLevel >
+                    client.info().powerLevels.create && (
+                    <span
+                      className="menu-button-wrapper"
+                      onClick={() => {
+                        let inputRef: any = React.createRef();
+                        let privateCheckRef: any = React.createRef();
 
-                      const newChannelForm = (
-                        <form
-                          onSubmit={async (event) => {
-                            event.preventDefault();
-                            if (inputRef.value === '') {
-                              return;
-                            }
-                            this.closeModal();
+                        const newChannelForm = (
+                          <form
+                            onSubmit={async (event) => {
+                              event.preventDefault();
+                              if (inputRef.value === '') {
+                                return;
+                              }
+                              this.closeModal();
 
-                            const channel = await client.channels.create(
-                              inputRef.value,
-                              privateCheckRef.checked
-                            );
-                            await client.channels.join(channel.channelID);
-                          }}
-                        >
-                          <p className="has-text-white">CREATE CHANNEL</p>
-                          <br />
-                          <label>Channel Name</label>
-                          <input
-                            autoFocus
-                            ref={(ref) => (inputRef = ref)}
-                            className={`input`}
-                          ></input>
-                          <br />
-                          <br />
-                          <input
-                            type="checkbox"
-                            ref={(ref) => (privateCheckRef = ref)}
-                          ></input>
-                          &nbsp;
-                          <label>Private?</label>
-                          <div className="modal-bottom-strip has-text-right">
-                            <button className="button is-black" type="submit">
-                              Save
-                            </button>
-                          </div>
-                        </form>
-                      );
-
-                      this.openModal(newChannelForm);
-                    }}
-                  >
-                    <FontAwesomeIcon icon={faPlus} />
-                  </span>
-                )}
-            </p>
-            <ul className="menu-list">
-              {this.state.channelList.map((channel) => (
-                <div key={'channel-list-' + channel.channelID}>
-                  <ContextMenuTrigger
-                    id={'channel-list-trigger-' + channel.channelID}
-                  >
-                    <li>
-                      <Link to={'/channel/' + channel.channelID}>
-                        <FontAwesomeIcon
-                          icon={channel.public ? faHashtag : faKey}
-                        />
-                        &nbsp;&nbsp;<strong>{channel.name}</strong>
-                      </Link>
-                    </li>
-                  </ContextMenuTrigger>
-                  <ContextMenu id={'channel-list-trigger-' + channel.channelID}>
-                    {!channel.public && (
-                      <MenuItem
-                        onClick={async (event, data) => {
-                          const permissionList = await client.permissions.retrieve(
-                            channel.channelID
-                          );
-                          const userArray = [];
-
-                          for (const perm of permissionList) {
-                            const user = await client.users.retrieve(
-                              perm.userID
-                            );
-                            userArray.push(user);
-                          }
-
-                          let selectedUser = '';
-
-                          const channelPermsEditor = (
-                            <div className="large-modal">
-                              <p className="has-text-white">
-                                #{channel.name.toUpperCase()} CHANNEL
-                                PERMISSIONS
-                              </p>
-                              <br />
-                              <ul>
-                                {userArray.map((user) => {
-                                  let spanRef: HTMLSpanElement | null = null;
-                                  let liRef: HTMLLIElement | null = null;
-                                  return (
-                                    <li
-                                      key={'channel-perm-' + user.userID}
-                                      ref={(ref) => (liRef = ref)}
-                                    >
-                                      <span
-                                        className="menu-button-wrapper"
-                                        ref={(ref) => (spanRef = ref)}
-                                        onClick={async () => {
-                                          if (selectedUser === user.userID) {
-                                            await client.permissions.delete(
-                                              user.userID,
-                                              channel.channelID
-                                            );
-                                            liRef!.remove();
-                                          } else {
-                                            selectedUser = user.userID;
-                                            spanRef!.setAttribute(
-                                              'class',
-                                              'menu-button-wrapper has-text-danger'
-                                            );
-                                          }
-                                        }}
-                                      >
-                                        <FontAwesomeIcon icon={faTimes} />
-                                        &nbsp;&nbsp;
-                                      </span>
-                                      <span
-                                        className="message-username has-text-weight-bold"
-                                        style={{
-                                          color: getUserColor(user.userID),
-                                        }}
-                                      >
-                                        {user.username}
-                                        <span className="translucent">
-                                          #{getUserHexTag(user.userID)}
-                                        </span>
-                                      </span>
-                                      {getUserIcon(user.powerLevel)}
-                                    </li>
-                                  );
-                                })}
-                              </ul>
+                              const channel = await client.channels.create(
+                                inputRef.value,
+                                privateCheckRef.checked
+                              );
+                              await client.channels.join(channel.channelID);
+                            }}
+                          >
+                            <p className="has-text-white">CREATE CHANNEL</p>
+                            <br />
+                            <label>Channel Name</label>
+                            <input
+                              autoFocus
+                              ref={(ref) => (inputRef = ref)}
+                              className={`input`}
+                            ></input>
+                            <br />
+                            <br />
+                            <input
+                              type="checkbox"
+                              ref={(ref) => (privateCheckRef = ref)}
+                            ></input>
+                            &nbsp;
+                            <label>Private?</label>
+                            <div className="modal-bottom-strip has-text-right">
+                              <button className="button is-black" type="submit">
+                                Save
+                              </button>
                             </div>
-                          );
+                          </form>
+                        );
 
-                          this.openModal(channelPermsEditor);
-                        }}
-                      >
-                        <p>Permissions</p>
-                      </MenuItem>
-                    )}
-                    {client.info().client &&
-                      client.info().client!.powerLevel >
-                        client.info().powerLevels.delete && (
+                        this.openModal(newChannelForm);
+                      }}
+                    >
+                      <FontAwesomeIcon icon={faPlus} />
+                    </span>
+                  )}
+              </p>
+              <ul className="menu-list">
+                {this.state.channelList.map((channel) => (
+                  <div key={'channel-list-' + channel.channelID}>
+                    <ContextMenuTrigger
+                      id={'channel-list-trigger-' + channel.channelID}
+                    >
+                      <li>
+                        <Link to={'/channel/' + channel.channelID}>
+                          <FontAwesomeIcon
+                            icon={channel.public ? faHashtag : faKey}
+                          />
+                          &nbsp;&nbsp;<strong>{channel.name}</strong>
+                        </Link>
+                      </li>
+                    </ContextMenuTrigger>
+                    <ContextMenu
+                      id={'channel-list-trigger-' + channel.channelID}
+                    >
+                      {!channel.public && (
                         <MenuItem
-                          onClick={(event, data) => {
-                            const deleteConfirm = (
-                              <div>
-                                <div className="has-text-white">
-                                  <span className="has-text-white">
-                                    CONFIRM
-                                  </span>
-                                  <br />
-                                  Are you sure you want to delete{' '}
-                                  <strong>{channel.name}</strong>?
-                                </div>
-                                <div className="modal-bottom-strip">
-                                  <div className="buttons is-right">
-                                    <button
-                                      className="button is-danger"
-                                      onClick={async () => {
-                                        this.closeModal();
-                                        await client.channels.delete(
-                                          channel.channelID
-                                        );
-                                      }}
-                                    >
-                                      Yes
-                                    </button>
-                                    <button
-                                      className="button is-black"
-                                      onClick={this.closeModal}
-                                    >
-                                      No
-                                    </button>
-                                  </div>
-                                </div>
-                              </div>
+                          onClick={async (event, data) => {
+                            const permissionList = await client.permissions.retrieve(
+                              channel.channelID
                             );
+                            const userArray = [];
 
-                            this.openModal(deleteConfirm);
-                          }}
-                          data={channel}
-                        >
-                          Delete Channel
-                        </MenuItem>
-                      )}
-                    <MenuItem divider />
-                    <MenuItem
-                      onClick={async (event, data: IChannel) => {
-                        const channelList = await client.channels.retrieve();
-                        for (const channel of channelList) {
-                          if (channel.channelID === data.channelID) {
-                            this.openModal(
-                              <div>
+                            for (const perm of permissionList) {
+                              const user = await client.users.retrieve(
+                                perm.userID
+                              );
+                              userArray.push(user);
+                            }
+
+                            let selectedUser = '';
+
+                            const channelPermsEditor = (
+                              <div className="large-modal">
                                 <p className="has-text-white">
-                                  #{channel.name.toUpperCase()} CHANNEL INFO
+                                  #{channel.name.toUpperCase()} CHANNEL
+                                  PERMISSIONS
                                 </p>
                                 <br />
-                                <p className="has-text-white is-family-monospace is-size-7">
-                                  index: {channel.index.toString()}
-                                </p>
-                                <p className="has-text-white is-family-monospace is-size-7">
-                                  channelID: {channel.channelID}
-                                </p>
-                                <p className="has-text-white is-family-monospace is-size-7">
-                                  adminID: {channel.admin}
-                                </p>
-                                <p className="has-text-white is-family-monospace is-size-7">
-                                  public: {String(channel.public)}
-                                </p>
+                                <ul>
+                                  {userArray.map((user) => {
+                                    let spanRef: HTMLSpanElement | null = null;
+                                    let liRef: HTMLLIElement | null = null;
+                                    return (
+                                      <li
+                                        key={'channel-perm-' + user.userID}
+                                        ref={(ref) => (liRef = ref)}
+                                      >
+                                        <span
+                                          className="menu-button-wrapper"
+                                          ref={(ref) => (spanRef = ref)}
+                                          onClick={async () => {
+                                            if (selectedUser === user.userID) {
+                                              await client.permissions.delete(
+                                                user.userID,
+                                                channel.channelID
+                                              );
+                                              liRef!.remove();
+                                            } else {
+                                              selectedUser = user.userID;
+                                              spanRef!.setAttribute(
+                                                'class',
+                                                'menu-button-wrapper has-text-danger'
+                                              );
+                                            }
+                                          }}
+                                        >
+                                          <FontAwesomeIcon icon={faTimes} />
+                                          &nbsp;&nbsp;
+                                        </span>
+                                        <span
+                                          className="message-username has-text-weight-bold"
+                                          style={{
+                                            color: getUserColor(user.userID),
+                                          }}
+                                        >
+                                          {user.username}
+                                          <span className="translucent">
+                                            #{getUserHexTag(user.userID)}
+                                          </span>
+                                        </span>
+                                        {getUserIcon(user.powerLevel)}
+                                      </li>
+                                    );
+                                  })}
+                                </ul>
                               </div>
                             );
-                          }
-                        }
-                      }}
-                      data={channel}
-                    >
-                      Channel Info
-                    </MenuItem>
-                  </ContextMenu>
-                </div>
-              ))}
-            </ul>
-          </aside>
 
-          <div className="user-bar">
-            <div className="Aligner">
-              <div className="Aligner-item Aligner-item--top" />
-              <div className="Aligner-item">
-                {client.info().client && (
-                  <Fragment>
-                    <span className="image is-32x32 user-bar-avatar">
-                      {getAvatar(client.info().client!.userID)}
-                    </span>
-                    <span
-                      className="user-bar-username"
-                      style={{
-                        color: getUserColor(client.info().client!.userID),
-                      }}
-                    >
-                      {client.info().client!.username}
-                      <span className="translucent">
-                        {/* "#" + getUserHexTag(client.info().client!.userID) */}
+                            this.openModal(channelPermsEditor);
+                          }}
+                        >
+                          <p>Permissions</p>
+                        </MenuItem>
+                      )}
+                      {client.info().client &&
+                        client.info().client!.powerLevel >
+                          client.info().powerLevels.delete && (
+                          <MenuItem
+                            onClick={(event, data) => {
+                              const deleteConfirm = (
+                                <div>
+                                  <div className="has-text-white">
+                                    <span className="has-text-white">
+                                      CONFIRM
+                                    </span>
+                                    <br />
+                                    Are you sure you want to delete{' '}
+                                    <strong>{channel.name}</strong>?
+                                  </div>
+                                  <div className="modal-bottom-strip">
+                                    <div className="buttons is-right">
+                                      <button
+                                        className="button is-danger"
+                                        onClick={async () => {
+                                          this.closeModal();
+                                          await client.channels.delete(
+                                            channel.channelID
+                                          );
+                                        }}
+                                      >
+                                        Yes
+                                      </button>
+                                      <button
+                                        className="button is-black"
+                                        onClick={this.closeModal}
+                                      >
+                                        No
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+
+                              this.openModal(deleteConfirm);
+                            }}
+                            data={channel}
+                          >
+                            Delete Channel
+                          </MenuItem>
+                        )}
+                      <MenuItem divider />
+                      <MenuItem
+                        onClick={async (event, data: IChannel) => {
+                          const channelList = await client.channels.retrieve();
+                          for (const channel of channelList) {
+                            if (channel.channelID === data.channelID) {
+                              this.openModal(
+                                <div>
+                                  <p className="has-text-white">
+                                    #{channel.name.toUpperCase()} CHANNEL INFO
+                                  </p>
+                                  <br />
+                                  <p className="has-text-white is-family-monospace is-size-7">
+                                    index: {channel.index.toString()}
+                                  </p>
+                                  <p className="has-text-white is-family-monospace is-size-7">
+                                    channelID: {channel.channelID}
+                                  </p>
+                                  <p className="has-text-white is-family-monospace is-size-7">
+                                    adminID: {channel.admin}
+                                  </p>
+                                  <p className="has-text-white is-family-monospace is-size-7">
+                                    public: {String(channel.public)}
+                                  </p>
+                                </div>
+                              );
+                            }
+                          }
+                        }}
+                        data={channel}
+                      >
+                        Channel Info
+                      </MenuItem>
+                    </ContextMenu>
+                  </div>
+                ))}
+              </ul>
+            </aside>
+
+            <div className="user-bar">
+              <div className="Aligner">
+                <div className="Aligner-item Aligner-item--top" />
+                <div className="Aligner-item">
+                  {client.info().client && (
+                    <Fragment>
+                      <span className="image is-32x32 user-bar-avatar">
+                        {getAvatar(client.info().client!.userID)}
                       </span>
-                    </span>
-                    <span
-                      className="user-bar-cog-wrapper"
-                      onClick={async () => {
-                        this.openModal(
-                          await userProfile(client.info().client!.userID)
-                        );
-                      }}
-                    >
-                      <FontAwesomeIcon icon={faCog} />
-                    </span>
-                  </Fragment>
-                )}
+                      <span
+                        className="user-bar-username"
+                        style={{
+                          color: getUserColor(client.info().client!.userID),
+                        }}
+                      >
+                        {client.info().client!.username}
+                        <span className="translucent">
+                          {/* "#" + getUserHexTag(client.info().client!.userID) */}
+                        </span>
+                      </span>
+                      <span
+                        className="user-bar-cog-wrapper"
+                        onClick={async () => {
+                          this.openModal(
+                            await userProfile(client.info().client!.userID)
+                          );
+                        }}
+                      >
+                        <FontAwesomeIcon icon={faCog} />
+                      </span>
+                    </Fragment>
+                  )}
+                </div>
+                <div className="Aligner-item Aligner-item--bottom" />
               </div>
-              <div className="Aligner-item Aligner-item--bottom" />
             </div>
           </div>
-        </div>
+        </Swipeable>
         <div className="chat-window has-background-black-ter">
           <div className="chat-message-wrapper">
             {chunkedArray.map((messages) => {
@@ -686,11 +811,16 @@ export class Chat extends Component<Props, State> {
                         >
                           {' '}
                           {message.message.charAt(0) === '>' ? (
-                            <p className="has-text-success">
+                            <span className="has-text-success chat-message-text">
                               {message.message}
-                            </p>
+                            </span>
                           ) : (
-                            <ReactMarkdown source={message.message} linkTarget={"_blank"} />
+                            <span className="chat-message-text">
+                              <ReactMarkdown
+                                source={message.message}
+                                linkTarget={'_blank'}
+                              />
+                            </span>
                           )}
                         </span>
                       ))}
@@ -736,68 +866,82 @@ export class Chat extends Component<Props, State> {
             />
           </div>
         </div>
-        <div className="right-sidebar has-background-black-bis">
-          <aside className="menu">
-            <p className="menu-label">Online</p>
-            <ul className="menu-list">
-              {this.state.onlineLists[this.props.match.params.id] &&
-                uniqueArray(
-                  this.state.onlineLists[this.props.match.params.id]
-                ).map((user) => {
-                  return (
-                    <div key={'online-user-' + user.userID}>
-                      <ContextMenuTrigger
-                        id={'online-user-trigger-' + user.userID}
-                      >
-                        <a>
-                          <li>
-                            {' '}
-                            <span
-                              className="message-username has-text-weight-bold"
-                              style={{
-                                color: getUserColor(user.userID),
-                              }}
-                            >
-                              {user.username}
-                              <span className="translucent">
-                                #{getUserHexTag(user.userID)}
+        <Swipeable
+          onSwipedRight={(eventData) => {
+            if (this.state.viewportWidth > 1024) {
+              return;
+            }
+            this.closeRightBar();
+          }}
+        >
+          <div
+            id="onlineUserBar"
+            className={`right-sidebar has-background-black-bis ${
+              this.state.rightBarOpen ? '' : 'hidden'
+            }`}
+          >
+            <aside className="menu">
+              <p className="menu-label">Online</p>
+              <ul className="menu-list">
+                {this.state.onlineLists[this.props.match.params.id] &&
+                  uniqueArray(
+                    this.state.onlineLists[this.props.match.params.id]
+                  ).map((user) => {
+                    return (
+                      <div key={'online-user-' + user.userID}>
+                        <ContextMenuTrigger
+                          id={'online-user-trigger-' + user.userID}
+                        >
+                          <a>
+                            <li>
+                              {' '}
+                              <span
+                                className="message-username has-text-weight-bold"
+                                style={{
+                                  color: getUserColor(user.userID),
+                                }}
+                              >
+                                {user.username}
+                                <span className="translucent">
+                                  #{getUserHexTag(user.userID)}
+                                </span>
                               </span>
-                            </span>
-                            {getUserIcon(user.powerLevel)}
-                          </li>
-                        </a>
-                      </ContextMenuTrigger>
-                      <ContextMenu id={'online-user-trigger-' + user.userID}>
-                        {user.userID === client.info().client?.userID && (
-                          <MenuItem data={user} onClick={this.changeNickname}>
-                            Change Nickname
-                          </MenuItem>
-                        )}
+                              {getUserIcon(user.powerLevel)}
+                            </li>
+                          </a>
+                        </ContextMenuTrigger>
+                        <ContextMenu id={'online-user-trigger-' + user.userID}>
+                          {user.userID === client.info().client?.userID && (
+                            <MenuItem data={user} onClick={this.changeNickname}>
+                              Change Nickname
+                            </MenuItem>
+                          )}
 
-                        <MenuItem
-                          data={user}
-                          onClick={async (e: any, data: any) => {
-                            this.openModal(await userProfile(user.userID));
-                          }}
-                        >
-                          Add To Channel
-                        </MenuItem>
-                        <MenuItem divider />
-                        <MenuItem
-                          data={user}
-                          onClick={async (e: any, data: any) => {
-                            this.openModal(await userProfile(user.userID));
-                          }}
-                        >
-                          View Profile
-                        </MenuItem>
-                      </ContextMenu>
-                    </div>
-                  );
-                })}
-            </ul>
-          </aside>
-        </div>
+                          <MenuItem
+                            data={user}
+                            onClick={async (e: any, data: any) => {
+                              this.openModal(await userProfile(user.userID));
+                            }}
+                          >
+                            Add To Channel
+                          </MenuItem>
+                          <MenuItem divider />
+                          <MenuItem
+                            data={user}
+                            onClick={async (e: any, data: any) => {
+                              this.openModal(await userProfile(user.userID));
+                            }}
+                          >
+                            View Profile
+                          </MenuItem>
+                        </ContextMenu>
+                      </div>
+                    );
+                  })}
+              </ul>
+            </aside>
+          </div>
+        </Swipeable>
       </div>
     );
   }
