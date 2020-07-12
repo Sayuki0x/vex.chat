@@ -486,12 +486,9 @@ export class Chat extends Component<Props, State> {
             <aside className="menu">
               <p className="menu-label">
                 <span className="menu-title-wrapper">Channels</span>
-                {client.info().client &&
-                  client.info().client!.powerLevel >
-                    client.info().powerLevels.create && (
-                    <span className="icon-group">
-                      {this.state.viewportWidth < tablet && (
-                      <span
+                <span className="icon-group">
+                  {this.state.viewportWidth < tablet && (
+                    <span
                       className="close-button-wrapper"
                       onClick={() => {
                         this.closeLeftBar();
@@ -502,7 +499,10 @@ export class Chat extends Component<Props, State> {
                         className={'has-text-red'}
                       />
                     </span>
-                      )}
+                  )}
+                  {client.info().client &&
+                    client.info().client!.powerLevel >
+                      client.info().powerLevels.create && (
                       <span
                         className="menu-button-wrapper"
                         onClick={() => {
@@ -553,12 +553,13 @@ export class Chat extends Component<Props, State> {
                           );
 
                           this.openModal(newChannelForm);
+                          this.closeLeftBar();
                         }}
                       >
                         <FontAwesomeIcon icon={faPlus} />
                       </span>
-                    </span>
-                  )}
+                    )}
+                </span>
               </p>
               <ul className="menu-list">
                 {this.state.channelList.map((channel) => (
@@ -977,16 +978,15 @@ export class Chat extends Component<Props, State> {
           >
             <aside className="menu">
               {this.state.viewportWidth < desktop && (
-              <span
-              className="close-button-wrapper"
-              onClick={() => {
-                this.closeRightBar();
-              }}
-            >
-              <FontAwesomeIcon icon={faTimes} className={'has-text-red'} />
-            </span>
+                <span
+                  className="close-button-wrapper"
+                  onClick={() => {
+                    this.closeRightBar();
+                  }}
+                >
+                  <FontAwesomeIcon icon={faTimes} className={'has-text-red'} />
+                </span>
               )}
-
               <p className="menu-label">Online</p>
               <ul className="menu-list">
                 {this.state.onlineLists[this.props.match.params.id] &&
