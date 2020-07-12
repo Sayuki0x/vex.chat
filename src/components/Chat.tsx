@@ -72,6 +72,8 @@ type State = {
   widthHistory: number[];
   leftBarOpen: boolean;
   rightBarOpen: boolean;
+  leftBarClosing: boolean;
+  rightBarClosing: boolean;
 };
 
 type Props = {
@@ -99,6 +101,8 @@ export class Chat extends Component<Props, State> {
       widthHistory: [window.innerWidth],
       leftBarOpen: window.innerWidth > tablet,
       rightBarOpen: window.innerWidth > desktop,
+      rightBarClosing: false,
+      leftBarClosing: false,
     };
 
     this.scrollToBottom = this.scrollToBottom.bind(this);
@@ -331,12 +335,14 @@ export class Chat extends Component<Props, State> {
     this.setState(
       {
         rightBarAnimation: 'slide-out-right',
+        rightBarClosing: true,
       },
       async () => {
         await Utils.sleep(500);
         this.setState({
           rightBarOpen: false,
           rightBarAnimation: '',
+          rightBarClosing: false,
         });
       }
     );
@@ -361,12 +367,14 @@ export class Chat extends Component<Props, State> {
     this.setState(
       {
         leftBarAnimation: 'slide-out-left',
+        leftBarClosing: true,
       },
       async () => {
         await Utils.sleep(500);
         this.setState({
           leftBarOpen: false,
           leftBarAnimation: '',
+          leftBarClosing: false,
         });
       }
     );
@@ -456,7 +464,7 @@ export class Chat extends Component<Props, State> {
                   <FontAwesomeIcon
                     icon={faBars}
                     className={`${
-                      this.state.leftBarOpen
+                      this.state.leftBarOpen && !this.state.leftBarClosing
                         ? 'has-text-white'
                         : 'has-text-grey-darker'
                     }`}
@@ -506,7 +514,7 @@ export class Chat extends Component<Props, State> {
                   <FontAwesomeIcon
                     icon={faUsers}
                     className={`${
-                      this.state.rightBarOpen
+                      this.state.rightBarOpen && !this.state.rightBarClosing
                         ? 'has-text-white'
                         : 'has-text-grey-darker'
                     }`}
