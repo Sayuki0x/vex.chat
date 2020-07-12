@@ -113,9 +113,10 @@ export const userProfile = async (userID: string) => {
                             event.target.files[0].size.toString() +
                             ')'
                         );
-                        document.getElementById("error-message")!.innerHTML = 'File is not the correct size for private key (expected size 128, received size ' +
-                        event.target.files[0].size.toString() +
-                        ')'
+                        document.getElementById('error-message')!.innerHTML =
+                          'File is not the correct size for private key (expected size 128, received size ' +
+                          event.target.files[0].size.toString() +
+                          ')';
 
                         return;
                       }
@@ -131,7 +132,7 @@ export const userProfile = async (userID: string) => {
                           testKeyring.init();
                         } catch (err) {
                           console.log(err);
-                          errorRef!.textContent = err.toString()
+                          errorRef!.textContent = err.toString();
                         }
                       };
                       reader.onerror = (error) => {
@@ -150,12 +151,8 @@ export const userProfile = async (userID: string) => {
                   Import Private Key
                 </button>
               </div>
-              <div
-                className="notification is-black"
-              >
-                <div id="error-message" className="has-text-danger">
-
-                </div>
+              <div className="notification is-black">
+                <div id="error-message" className="has-text-danger"></div>
               </div>
             </div>
           )}

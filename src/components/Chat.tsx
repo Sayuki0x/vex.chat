@@ -15,6 +15,8 @@ import {
   faKey,
   faTimes,
   faCog,
+  faBars,
+  faUsers,
 } from '@fortawesome/free-solid-svg-icons';
 import { getUserIcon, userProfile, getAvatar } from './userProfile';
 import { MultiSelect } from './Select';
@@ -30,6 +32,9 @@ const uniqueArray = (arr: any[]) => {
     );
   });
 };
+
+const tablet = 769;
+const desktop = 1024;
 
 type State = {
   channelList: IChannel[];
@@ -68,8 +73,8 @@ export class Chat extends Component<Props, State> {
       viewportWidth: window.innerWidth,
       viewportHeight: window.innerHeight,
       widthHistory: [window.innerWidth],
-      leftBarOpen: window.innerWidth > 769,
-      rightBarOpen: window.innerWidth > 1024,
+      leftBarOpen: window.innerWidth > tablet,
+      rightBarOpen: window.innerWidth > desktop,
     };
 
     this.scrollToBottom = this.scrollToBottom.bind(this);
@@ -87,22 +92,22 @@ export class Chat extends Component<Props, State> {
     const { innerWidth, innerHeight } = window;
     const { widthHistory } = this.state;
 
-    // leftBarOpen: window.innerWidth > 769,
-    // rightBarOpen: window.innerWidth > 1024,
+    // leftBarOpen: window.innerWidth > tablet,
+    // rightBarOpen: window.innerWidth > desktop,
 
-    if (widthHistory[0] <= 769 && innerWidth > 769) {
+    if (widthHistory[0] <= tablet && innerWidth > tablet) {
       this.openLeftBar();
     }
 
-    if (widthHistory[0] >= 769 && innerWidth < 769) {
+    if (widthHistory[0] >= tablet && innerWidth < tablet) {
       this.closeLeftBar();
     }
 
-    if (widthHistory[0] <= 1024 && innerWidth > 1024) {
+    if (widthHistory[0] <= desktop && innerWidth > desktop) {
       this.openRightBar();
     }
 
-    if (widthHistory[0] >= 1024 && innerWidth < 1024) {
+    if (widthHistory[0] >= desktop && innerWidth < desktop) {
       this.closeRightBar();
     }
 
@@ -319,7 +324,7 @@ export class Chat extends Component<Props, State> {
       >
         <Swipeable
           onSwipedRight={(eventData) => {
-            if (this.state.viewportWidth > 769) {
+            if (this.state.viewportWidth > tablet) {
               return;
             }
             this.openLeftBar();
@@ -331,7 +336,6 @@ export class Chat extends Component<Props, State> {
 
         <Swipeable
           onSwipedLeft={(eventData) => {
-
             this.openRightBar();
           }}
         >
@@ -372,28 +376,72 @@ export class Chat extends Component<Props, State> {
             </h1>
           </div>
           <div className="top-bar-right has-background-black-ter">
-            <div className="columns"></div>
-            <h1 className="title is-size-4 has-text-white">
-              {this.state.channelList.map((channel) => {
-                if (channel.channelID === this.props.match.params.id) {
-                  return (
-                    <span key={'channel-title-' + channel.channelID}>
-                      <FontAwesomeIcon
-                        icon={channel.public ? faHashtag : faKey}
-                      />
-                      &nbsp;&nbsp;{channel.name}
-                    </span>
-                  );
-                } else {
-                  return null;
-                }
-              })}
-            </h1>
+            <div
+              className={`mobile-menu-toggle-wrapper ${
+                this.state.viewportWidth > tablet ? 'hidden' : ''
+              }`}
+              onClick={() => {
+                this.openLeftBar();
+              }}
+            >
+              <div className="Aligner">
+                <div className="Aligner-item Aligner-item--top"></div>
+                <div className="Aligner-item">
+                  <FontAwesomeIcon icon={faBars} />
+                </div>
+                <div className="Aligner-item Aligner-item--bottom"></div>
+              </div>
+            </div>
+            <div className="channel-name-wrapper">
+              <div className="Aligner">
+                <div className="Aligner-item Aligner-item--top"></div>
+                <div className="Aligner-item">
+                  <h1 className="title is-size-4 has-text-white">
+                    {this.state.channelList.map((channel) => {
+                      if (channel.channelID === this.props.match.params.id) {
+                        return (
+                          <span
+                            className="channel-name-text"
+                            key={'channel-title-' + channel.channelID}
+                          >
+                            <FontAwesomeIcon
+                              icon={channel.public ? faHashtag : faKey}
+                              size={'sm'}
+                            />
+                            &nbsp;
+                            {channel.name}
+                          </span>
+                        );
+                      } else {
+                        return null;
+                      }
+                    })}
+                  </h1>
+                </div>
+                <div className="Aligner-item Aligner-item--bottom"></div>
+              </div>
+            </div>
+            {this.state.viewportWidth < desktop && (
+              <div
+                className="user-menu-toggle-wrapper"
+                onClick={() => {
+                  this.openRightBar();
+                }}
+              >
+                <div className="Aligner">
+                  <div className="Aligner-item Aligner-item--top"></div>
+                  <div className="Aligner-item">
+                    <FontAwesomeIcon icon={faUsers} />
+                  </div>
+                  <div className="Aligner-item Aligner-item--bottom"></div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
         <Swipeable
           onSwipedLeft={(eventData) => {
-            if (this.state.viewportWidth > 769) {
+            if (this.state.viewportWidth > tablet) {
               return;
             }
             this.closeLeftBar();
@@ -411,56 +459,74 @@ export class Chat extends Component<Props, State> {
                 {client.info().client &&
                   client.info().client!.powerLevel >
                     client.info().powerLevels.create && (
-                    <span
-                      className="menu-button-wrapper"
+                    <span className="icon-group">
+                      {this.state.viewportWidth < tablet && (
+                      <span
+                      className="close-button-wrapper"
                       onClick={() => {
-                        let inputRef: any = React.createRef();
-                        let privateCheckRef: any = React.createRef();
-
-                        const newChannelForm = (
-                          <form
-                            onSubmit={async (event) => {
-                              event.preventDefault();
-                              if (inputRef.value === '') {
-                                return;
-                              }
-                              this.closeModal();
-
-                              const channel = await client.channels.create(
-                                inputRef.value,
-                                privateCheckRef.checked
-                              );
-                              await client.channels.join(channel.channelID);
-                            }}
-                          >
-                            <p className="has-text-white">CREATE CHANNEL</p>
-                            <br />
-                            <label>Channel Name</label>
-                            <input
-                              autoFocus
-                              ref={(ref) => (inputRef = ref)}
-                              className={`input`}
-                            ></input>
-                            <br />
-                            <br />
-                            <input
-                              type="checkbox"
-                              ref={(ref) => (privateCheckRef = ref)}
-                            ></input>
-                            &nbsp;
-                            <label>Private?</label>
-                            <div className="modal-bottom-strip has-text-right">
-                              <button className="button is-black" type="submit">
-                                Save
-                              </button>
-                            </div>
-                          </form>
-                        );
-
-                        this.openModal(newChannelForm);
+                        this.closeLeftBar();
                       }}
                     >
-                      <FontAwesomeIcon icon={faPlus} />
+                      <FontAwesomeIcon
+                        icon={faTimes}
+                        className={'has-text-red'}
+                      />
+                    </span>
+                      )}
+                      <span
+                        className="menu-button-wrapper"
+                        onClick={() => {
+                          let inputRef: any = React.createRef();
+                          let privateCheckRef: any = React.createRef();
+
+                          const newChannelForm = (
+                            <form
+                              onSubmit={async (event) => {
+                                event.preventDefault();
+                                if (inputRef.value === '') {
+                                  return;
+                                }
+                                this.closeModal();
+
+                                const channel = await client.channels.create(
+                                  inputRef.value,
+                                  privateCheckRef.checked
+                                );
+                                await client.channels.join(channel.channelID);
+                              }}
+                            >
+                              <p className="has-text-white">CREATE CHANNEL</p>
+                              <br />
+                              <label>Channel Name</label>
+                              <input
+                                autoFocus
+                                ref={(ref) => (inputRef = ref)}
+                                className={`input`}
+                              ></input>
+                              <br />
+                              <br />
+                              <input
+                                type="checkbox"
+                                ref={(ref) => (privateCheckRef = ref)}
+                              ></input>
+                              &nbsp;
+                              <label>Private?</label>
+                              <div className="modal-bottom-strip has-text-right">
+                                <button
+                                  className="button is-black"
+                                  type="submit"
+                                >
+                                  Save
+                                </button>
+                              </div>
+                            </form>
+                          );
+
+                          this.openModal(newChannelForm);
+                        }}
+                      >
+                        <FontAwesomeIcon icon={faPlus} />
+                      </span>
                     </span>
                   )}
               </p>
@@ -670,12 +736,12 @@ export class Chat extends Component<Props, State> {
                       <span
                         className="user-bar-cog-wrapper"
                         onClick={async () => {
-                          if (this.state.viewportWidth < 769) {
-                            this.closeLeftBar();
-                          }
                           this.openModal(
                             await userProfile(client.info().client!.userID)
                           );
+                          if (this.state.viewportWidth < tablet) {
+                            this.closeLeftBar();
+                          }
                         }}
                       >
                         <FontAwesomeIcon icon={faCog} />
@@ -867,7 +933,7 @@ export class Chat extends Component<Props, State> {
         </div>
         <Swipeable
           onSwipedRight={(eventData) => {
-            if (this.state.viewportWidth > 1024) {
+            if (this.state.viewportWidth > desktop) {
               return;
             }
             this.closeRightBar();
@@ -880,6 +946,17 @@ export class Chat extends Component<Props, State> {
             }`}
           >
             <aside className="menu">
+              {this.state.viewportWidth < desktop && (
+              <span
+              className="close-button-wrapper"
+              onClick={() => {
+                this.closeRightBar();
+              }}
+            >
+              <FontAwesomeIcon icon={faTimes} className={'has-text-red'} />
+            </span>
+              )}
+
               <p className="menu-label">Online</p>
               <ul className="menu-list">
                 {this.state.onlineLists[this.props.match.params.id] &&
