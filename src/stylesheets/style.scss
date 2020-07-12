@@ -197,9 +197,6 @@ input {
 }
 
 @media screen and (max-width: $tablet) {
-  .left-sidebar {
-  }
-
   .right-sidebar {
     z-index: 4 !important;
     right: 0 !important;

@@ -106,8 +106,6 @@ export class Chat extends Component<Props, State> {
       this.closeRightBar();
     }
 
-    console.log(widthHistory[0], innerWidth);
-
     widthHistory.unshift(innerWidth);
     if (widthHistory.length > 100) {
       widthHistory.pop();
