@@ -523,6 +523,7 @@ export class Chat extends Component<Props, State> {
                           );
 
                           this.openModal(newChannelForm);
+                          this.closeLeftBar();
                         }}
                       >
                         <FontAwesomeIcon icon={faPlus} />
