@@ -250,6 +250,7 @@ input {
 
 .channel-name-text {
   float: left !important;
+  width: 100%;
 }
 
 .mobile-menu-toggle-wrapper {
@@ -272,9 +273,9 @@ input {
 .channel-name-wrapper {
   position: absolute;
   height: 100%;
-  width: calc(100% - 100px - 250px);
-  left: 50px;
+  width: 100%;
   top: 0;
+  z-index: -1;
 }
 
 /* The top menu */
@@ -371,7 +372,6 @@ input {
   width: 100%;
   height: 100%;
   padding: 10px;
-
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.07),
     0 4px 8px rgba(0, 0, 0, 0.07), 0 8px 16px rgba(0, 0, 0, 0.07),
     0 16px 32px rgba(0, 0, 0, 0.07), 0 32px 64px rgba(0, 0, 0, 0.07);
