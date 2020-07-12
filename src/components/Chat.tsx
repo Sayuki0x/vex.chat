@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { Component } from 'react';
+
+import React, { Component, Fragment } from 'react';
 import { IChannel, IClientInfo, IChatMessage, IUser } from 'libvex';
 import { client } from '../App';
 import { Link } from 'react-router-dom';
@@ -7,22 +8,27 @@ import { getUserColor, getUserHexTag } from '../utils/getUserColor';
 import ReactMarkdown from 'react-markdown';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import defaultAvatar from '../images/default_avatar.svg';
 import {
   faPlus,
   faHashtag,
   faKey,
   faTimes,
+  faCog,
 } from '@fortawesome/free-solid-svg-icons';
-import { getUserIcon, userProfile } from './userProfile';
+import { getUserIcon, userProfile, getAvatar } from './userProfile';
 import { MultiSelect } from './Select';
 
-const uniqueArray = (arr: any[]) => {return arr.filter((thing: any, index: number) => {
-  const _thing = JSON.stringify(thing);
-  return index === arr.findIndex(obj => {
-    return JSON.stringify(obj) === _thing;
+const uniqueArray = (arr: any[]) => {
+  return arr.filter((thing: any, index: number) => {
+    const _thing = JSON.stringify(thing);
+    return (
+      index ===
+      arr.findIndex((obj) => {
+        return JSON.stringify(obj) === _thing;
+      })
+    );
   });
-});}
+};
 
 type State = {
   channelList: IChannel[];
@@ -38,8 +44,6 @@ type State = {
 type Props = {
   match: any;
 };
-
-
 
 export class Chat extends Component<Props, State> {
   messagesEnd: any = React.createRef();
@@ -220,8 +224,6 @@ export class Chat extends Component<Props, State> {
     });
   }
 
-
-
   render() {
     const chunkedArray = this.state.chatHistory[this.props.match.params.id]
       ? this.chunkPosts(this.state.chatHistory[this.props.match.params.id])
@@ -288,60 +290,61 @@ export class Chat extends Component<Props, State> {
           <aside className="menu">
             <p className="menu-label">
               <span className="menu-title-wrapper">Channels</span>
-              {client.info().client && (client.info().client!.powerLevel > client.info().powerLevels.create) && (
-              <span
-              className="menu-button-wrapper"
-              onClick={() => {
-                let inputRef: any = React.createRef();
-                let privateCheckRef: any = React.createRef();
+              {client.info().client &&
+                client.info().client!.powerLevel >
+                  client.info().powerLevels.create && (
+                  <span
+                    className="menu-button-wrapper"
+                    onClick={() => {
+                      let inputRef: any = React.createRef();
+                      let privateCheckRef: any = React.createRef();
 
-                const newChannelForm = (
-                  <form
-                    onSubmit={async (event) => {
-                      event.preventDefault();
-                      if (inputRef.value === '') {
-                        return;
-                      }
-                      this.closeModal();
+                      const newChannelForm = (
+                        <form
+                          onSubmit={async (event) => {
+                            event.preventDefault();
+                            if (inputRef.value === '') {
+                              return;
+                            }
+                            this.closeModal();
 
-                      const channel = await client.channels.create(
-                        inputRef.value,
-                        privateCheckRef.checked
+                            const channel = await client.channels.create(
+                              inputRef.value,
+                              privateCheckRef.checked
+                            );
+                            await client.channels.join(channel.channelID);
+                          }}
+                        >
+                          <p className="has-text-white">CREATE CHANNEL</p>
+                          <br />
+                          <label>Channel Name</label>
+                          <input
+                            autoFocus
+                            ref={(ref) => (inputRef = ref)}
+                            className={`input`}
+                          ></input>
+                          <br />
+                          <br />
+                          <input
+                            type="checkbox"
+                            ref={(ref) => (privateCheckRef = ref)}
+                          ></input>
+                          &nbsp;
+                          <label>Private?</label>
+                          <div className="modal-bottom-strip has-text-right">
+                            <button className="button is-black" type="submit">
+                              Save
+                            </button>
+                          </div>
+                        </form>
                       );
-                      await client.channels.join(channel.channelID);
+
+                      this.openModal(newChannelForm);
                     }}
                   >
-                    <p className="has-text-white">CREATE CHANNEL</p>
-                    <br />
-                    <label>Channel Name</label>
-                    <input
-                      autoFocus
-                      ref={(ref) => (inputRef = ref)}
-                      className={`input`}
-                    ></input>
-                    <br />
-                    <br />
-                    <input
-                      type="checkbox"
-                      ref={(ref) => (privateCheckRef = ref)}
-                    ></input>
-                    &nbsp;
-                    <label>Private?</label>
-                    <div className="modal-bottom-strip has-text-right">
-                      <button className="button is-black" type="submit">
-                        Save
-                      </button>
-                    </div>
-                  </form>
-                );
-
-                this.openModal(newChannelForm);
-              }}
-            >
-              <FontAwesomeIcon icon={faPlus} />
-            </span>
-              )}
-
+                    <FontAwesomeIcon icon={faPlus} />
+                  </span>
+                )}
             </p>
             <ul className="menu-list">
               {this.state.channelList.map((channel) => (
@@ -379,7 +382,8 @@ export class Chat extends Component<Props, State> {
                           const channelPermsEditor = (
                             <div className="large-modal">
                               <p className="has-text-white">
-                                #{channel.name.toUpperCase()} CHANNEL PERMISSIONS
+                                #{channel.name.toUpperCase()} CHANNEL
+                                PERMISSIONS
                               </p>
                               <br />
                               <ul>
@@ -387,7 +391,10 @@ export class Chat extends Component<Props, State> {
                                   let spanRef: HTMLSpanElement | null = null;
                                   let liRef: HTMLLIElement | null = null;
                                   return (
-                                    <li key={'channel-perm-' + user.userID} ref={(ref) => (liRef = ref)}>
+                                    <li
+                                      key={'channel-perm-' + user.userID}
+                                      ref={(ref) => (liRef = ref)}
+                                    >
                                       <span
                                         className="menu-button-wrapper"
                                         ref={(ref) => (spanRef = ref)}
@@ -397,10 +404,13 @@ export class Chat extends Component<Props, State> {
                                               user.userID,
                                               channel.channelID
                                             );
-                                            liRef!.remove()
+                                            liRef!.remove();
                                           } else {
                                             selectedUser = user.userID;
-                                            spanRef!.setAttribute("class", "menu-button-wrapper has-text-danger")
+                                            spanRef!.setAttribute(
+                                              'class',
+                                              'menu-button-wrapper has-text-danger'
+                                            );
                                           }
                                         }}
                                       >
@@ -432,48 +442,52 @@ export class Chat extends Component<Props, State> {
                         <p>Permissions</p>
                       </MenuItem>
                     )}
-                    {client.info().client && (client.info().client!.powerLevel > client.info().powerLevels.delete) && (
-
-                    <MenuItem
-                      onClick={(event, data) => {
-                        const deleteConfirm = (
-                          <div>
-                            <div className="has-text-white">
-                              <span className="has-text-white">CONFIRM</span>
-                              <br />
-                              Are you sure you want to delete{' '}
-                              <strong>{channel.name}</strong>?
-                            </div>
-                            <div className="modal-bottom-strip">
-                              <div className="buttons is-right">
-                                <button
-                                  className="button is-danger"
-                                  onClick={async () => {
-                                    this.closeModal();
-                                    await client.channels.delete(
-                                      channel.channelID
-                                    );
-                                  }}
-                                >
-                                  Yes
-                                </button>
-                                <button
-                                  className="button is-black"
-                                  onClick={this.closeModal}
-                                >
-                                  No
-                                </button>
+                    {client.info().client &&
+                      client.info().client!.powerLevel >
+                        client.info().powerLevels.delete && (
+                        <MenuItem
+                          onClick={(event, data) => {
+                            const deleteConfirm = (
+                              <div>
+                                <div className="has-text-white">
+                                  <span className="has-text-white">
+                                    CONFIRM
+                                  </span>
+                                  <br />
+                                  Are you sure you want to delete{' '}
+                                  <strong>{channel.name}</strong>?
+                                </div>
+                                <div className="modal-bottom-strip">
+                                  <div className="buttons is-right">
+                                    <button
+                                      className="button is-danger"
+                                      onClick={async () => {
+                                        this.closeModal();
+                                        await client.channels.delete(
+                                          channel.channelID
+                                        );
+                                      }}
+                                    >
+                                      Yes
+                                    </button>
+                                    <button
+                                      className="button is-black"
+                                      onClick={this.closeModal}
+                                    >
+                                      No
+                                    </button>
+                                  </div>
+                                </div>
                               </div>
-                            </div>
-                          </div>
-                        );
+                            );
 
-                        this.openModal(deleteConfirm);
-                      }}
-                      data={channel}
-                    >
-                      Delete Channel
-                    </MenuItem>)}
+                            this.openModal(deleteConfirm);
+                          }}
+                          data={channel}
+                        >
+                          Delete Channel
+                        </MenuItem>
+                      )}
                     <MenuItem divider />
                     <MenuItem
                       onClick={async (event, data: IChannel) => {
@@ -481,14 +495,25 @@ export class Chat extends Component<Props, State> {
                         for (const channel of channelList) {
                           if (channel.channelID === data.channelID) {
                             this.openModal(
-                            <div>
-                              <p className="has-text-white">#{channel.name.toUpperCase()} CHANNEL INFO</p>
-                              <br />
-                              <p className="has-text-white is-family-monospace is-size-7">index: {channel.index.toString()}</p>
-                              <p className="has-text-white is-family-monospace is-size-7">channelID: {channel.channelID}</p>
-                              <p className="has-text-white is-family-monospace is-size-7">adminID: {channel.admin}</p>
-                              <p className="has-text-white is-family-monospace is-size-7">public: {String(channel.public)}</p>
-                            </div>);
+                              <div>
+                                <p className="has-text-white">
+                                  #{channel.name.toUpperCase()} CHANNEL INFO
+                                </p>
+                                <br />
+                                <p className="has-text-white is-family-monospace is-size-7">
+                                  index: {channel.index.toString()}
+                                </p>
+                                <p className="has-text-white is-family-monospace is-size-7">
+                                  channelID: {channel.channelID}
+                                </p>
+                                <p className="has-text-white is-family-monospace is-size-7">
+                                  adminID: {channel.admin}
+                                </p>
+                                <p className="has-text-white is-family-monospace is-size-7">
+                                  public: {String(channel.public)}
+                                </p>
+                              </div>
+                            );
                           }
                         }
                       }}
@@ -496,12 +521,48 @@ export class Chat extends Component<Props, State> {
                     >
                       Channel Info
                     </MenuItem>
-
                   </ContextMenu>
                 </div>
               ))}
             </ul>
           </aside>
+
+          <div className="user-bar">
+            <div className="Aligner">
+              <div className="Aligner-item Aligner-item--top" />
+              <div className="Aligner-item">
+                {client.info().client && (
+                  <Fragment>
+                    <span className="image is-32x32 user-bar-avatar">
+                      {getAvatar(client.info().client!.userID)}
+                    </span>
+                    <span
+                      className="user-bar-username"
+                      style={{
+                        color: getUserColor(client.info().client!.userID),
+                      }}
+                    >
+                      {client.info().client!.username}
+                      <span className="translucent">
+                        {/* "#" + getUserHexTag(client.info().client!.userID) */}
+                      </span>
+                    </span>
+                    <span
+                      className="user-bar-cog-wrapper"
+                      onClick={async () => {
+                        this.openModal(
+                          await userProfile(client.info().client!.userID)
+                        );
+                      }}
+                    >
+                      <FontAwesomeIcon icon={faCog} />
+                    </span>
+                  </Fragment>
+                )}
+              </div>
+              <div className="Aligner-item Aligner-item--bottom" />
+            </div>
+          </div>
         </div>
         <div className="chat-window has-background-black-ter">
           <div className="chat-message-wrapper">
@@ -514,14 +575,7 @@ export class Chat extends Component<Props, State> {
                 >
                   <figure className="media-left">
                     <p className="image is-48x48">
-                      <img
-                        src={defaultAvatar}
-                        className="is-rounded"
-                        alt="user avatar"
-                        style={{
-                          backgroundColor: getUserColor(messages[0].userID),
-                        }}
-                      />
+                      {getAvatar(messages[0].userID)}
                     </p>
                   </figure>
                   <div className="media-content">
@@ -556,51 +610,58 @@ export class Chat extends Component<Props, State> {
                             Change Nickname
                           </MenuItem>
                         )}
-                                      {client.info().client && (client.info().client!.powerLevel > client.info().powerLevels.grant) && (
-
-                        <MenuItem
-                          data={messages[0]}
-                          onClick={(e: any, data: any) => {
-                            let selectedValues: any[] = [];
-                            const grantForm = (
-                              <form
-                                className="large-modal"
-                                onSubmit={async (event) => {
-                                  event.preventDefault();
-                                  // this.closeModal();
-                                  for (const selection of selectedValues) {
-                                    await client.permissions.create(
-                                      messages[0].userID,
-                                      selection.value
-                                    );
-                                  }
-                                  this.closeModal();
-                                }}
-                              >
-                                <p className="has-text-white">ADD TO CHANNEL</p>
-                                <br />
-                                <MultiSelect
-                                  onChange={(values: any[], action: any) => {
-                                    selectedValues = values;
-                                  }}
-                                />
-                                <div className="modal-bottom-strip">
-                                  <div className="buttons is-right">
-                                    <button
-                                      className="button is-danger"
-                                      type="submit"
-                                    >
-                                      Add
-                                    </button>
-                                  </div>
-                                </div>
-                              </form>
-                            );
-                            this.openModal(grantForm);
-                          }}
-                        >
-                          Add To Channel
-                        </MenuItem>) }
+                        {client.info().client &&
+                          client.info().client!.powerLevel >
+                            client.info().powerLevels.grant && (
+                            <MenuItem
+                              data={messages[0]}
+                              onClick={(e: any, data: any) => {
+                                let selectedValues: any[] = [];
+                                const grantForm = (
+                                  <form
+                                    className="large-modal"
+                                    onSubmit={async (event) => {
+                                      event.preventDefault();
+                                      // this.closeModal();
+                                      for (const selection of selectedValues) {
+                                        await client.permissions.create(
+                                          messages[0].userID,
+                                          selection.value
+                                        );
+                                      }
+                                      this.closeModal();
+                                    }}
+                                  >
+                                    <p className="has-text-white">
+                                      ADD TO CHANNEL
+                                    </p>
+                                    <br />
+                                    <MultiSelect
+                                      onChange={(
+                                        values: any[],
+                                        action: any
+                                      ) => {
+                                        selectedValues = values;
+                                      }}
+                                    />
+                                    <div className="modal-bottom-strip">
+                                      <div className="buttons is-right">
+                                        <button
+                                          className="button is-danger"
+                                          type="submit"
+                                        >
+                                          Add
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </form>
+                                );
+                                this.openModal(grantForm);
+                              }}
+                            >
+                              Add To Channel
+                            </MenuItem>
+                          )}
                         <MenuItem divider />
                         <MenuItem
                           data={messages[0]}
@@ -629,7 +690,10 @@ export class Chat extends Component<Props, State> {
                               {message.message}
                             </p>
                           ) : (
-                            <ReactMarkdown source={message.message} linkTarget={"_blank"} />
+                            <ReactMarkdown
+                              source={message.message}
+                              linkTarget={'_blank'}
+                            />
                           )}
                         </span>
                       ))}
@@ -680,10 +744,11 @@ export class Chat extends Component<Props, State> {
             <p className="menu-label">Online</p>
             <ul className="menu-list">
               {this.state.onlineLists[this.props.match.params.id] &&
-                uniqueArray(this.state.onlineLists[this.props.match.params.id]).map(
-                  (user) => 
-                   { 
-                     return <div key={'online-user-' + user.userID}>
+                uniqueArray(
+                  this.state.onlineLists[this.props.match.params.id]
+                ).map((user) => {
+                  return (
+                    <div key={'online-user-' + user.userID}>
                       <ContextMenuTrigger
                         id={'online-user-trigger-' + user.userID}
                       >
@@ -712,7 +777,7 @@ export class Chat extends Component<Props, State> {
                           </MenuItem>
                         )}
 
-                      <MenuItem
+                        <MenuItem
                           data={user}
                           onClick={async (e: any, data: any) => {
                             this.openModal(await userProfile(user.userID));
@@ -724,18 +789,15 @@ export class Chat extends Component<Props, State> {
                         <MenuItem
                           data={user}
                           onClick={async (e: any, data: any) => {
-                            this.openModal(
-                              await userProfile(user.userID)
-                            );
+                            this.openModal(await userProfile(user.userID));
                           }}
                         >
                           View Profile
                         </MenuItem>
-
                       </ContextMenu>
                     </div>
-                  }
-                )}
+                  );
+                })}
             </ul>
           </aside>
         </div>

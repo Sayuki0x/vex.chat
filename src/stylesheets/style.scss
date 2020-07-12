@@ -124,14 +124,27 @@ input {
   background-color: $black-ter;
 }
 
+.user-bar {
+  position: absolute;
+  bottom: 0;
+  height: 100px;
+  width: 100%;
+  background-color: $black-bis;
+  border-top: $black-ter 2px solid;
+  z-index: 100;
+}
+
 .react-contextmenu-item--divider:hover {
   padding: 2px;
   background-color: $black-ter;
 }
 
+.user-bar-avatar {
+  float: left;
+}
+
 /* The sidebar menu */
 .right-sidebar {
-  padding: 20px;
   height: calc(
     100% - 50px
   ); /* Full-height: remove this if you want "auto" height */
@@ -142,7 +155,6 @@ input {
   top: 50px; /* Stay at the top */
   right: 0;
   overflow-x: hidden; /* Disable horizontal scroll */
-  padding-top: 20px;
 }
 
 /* The sidebar menu */
@@ -176,9 +188,12 @@ input {
   border-bottom: $black-bis 1px solid;
 }
 
+.menu {
+  margin: 20px;
+}
+
 /* The sidebar menu */
 .left-channelbar {
-  padding: 20px;
   height: calc(
     100% - 50px
   ); /* Full-height: remove this if you want "auto" height */
@@ -362,4 +377,38 @@ input {
 .channel-finder__multi-value__remove:hover {
   color: $white !important;
   background-color: $red !important;
+}
+
+.user-bar-username {
+  padding-left: 1ch;
+}
+
+.user-bar-cog-wrapper {
+  color: $grey-darker;
+  padding-left: 5ch;
+}
+.user-bar-cog-wrapper:hover {
+  cursor: pointer;
+  color: lighten($grey-darker, 5%);
+}
+
+.Aligner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.Aligner-item {
+  max-width: 80%;
+}
+
+.Aligner-item--top {
+  align-self: flex-start;
+}
+
+.Aligner-item--bottom {
+  align-self: flex-end;
 }
