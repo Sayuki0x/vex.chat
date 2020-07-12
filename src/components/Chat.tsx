@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 
 import React, { Component, Fragment } from 'react';
-import { IChannel, IClientInfo, IChatMessage, IUser } from 'libvex';
+import { IChannel, IClientInfo, IChatMessage, IUser, Utils } from 'libvex';
 import { client } from '../App';
 import { Link } from 'react-router-dom';
 import { getUserColor, getUserHexTag } from '../utils/getUserColor';
@@ -40,6 +40,8 @@ type State = {
   channelList: IChannel[];
   clientInfo: IClientInfo;
   onlineLists: Record<string, IUser[]>;
+  leftBarAnimation: string;
+  rightBarAnimation: string;
   chatHistory: Record<string, IChatMessage[]>;
   inputValue: string;
   modalIsActive: boolean;
@@ -67,6 +69,8 @@ export class Chat extends Component<Props, State> {
       clientInfo: client.info(),
       inputValue: '',
       onlineLists: {},
+      leftBarAnimation: "",
+      rightBarAnimation: "",
       modalIsActive: false,
       modalContents: <span />,
       joinedRooms: [],
@@ -287,26 +291,52 @@ export class Chat extends Component<Props, State> {
 
   closeRightBar() {
     this.setState({
-      rightBarOpen: false,
+      rightBarAnimation: "slide-out-right",
+    }, async () => {
+      await Utils.sleep(500);
+      this.setState({
+        rightBarOpen: false,
+        rightBarAnimation: "",
+      })
     });
   }
 
   openRightBar() {
     this.setState({
+      rightBarAnimation: "slide-in-right",
       rightBarOpen: true,
-    });
+    }, async () => {
+      await Utils.sleep(500);
+      this.setState({
+        rightBarAnimation: "",
+      });
+    })
+    
   }
 
   closeLeftBar() {
     this.setState({
-      leftBarOpen: false,
+      leftBarAnimation: "slide-out-left",
+    }, async () => {
+      await Utils.sleep(500);
+      this.setState({
+        leftBarOpen: false,
+        leftBarAnimation: "",
+      })
     });
   }
 
   openLeftBar() {
     this.setState({
+      leftBarAnimation: "slide-in-left",
       leftBarOpen: true,
-    });
+    }, async () => {
+      await Utils.sleep(500);
+      this.setState({
+        leftBarAnimation: "",
+      });
+    })
+    
   }
 
   render() {
@@ -449,7 +479,7 @@ export class Chat extends Component<Props, State> {
         >
           <div
             id="channelBar"
-            className={`left-channelbar has-background-black-bis ${
+            className={`${this.state.leftBarAnimation} left-channelbar has-background-black-bis ${
               this.state.leftBarOpen ? '' : 'hidden'
             }`}
           >
@@ -941,7 +971,7 @@ export class Chat extends Component<Props, State> {
         >
           <div
             id="onlineUserBar"
-            className={`right-sidebar has-background-black-bis ${
+            className={`${this.state.rightBarAnimation} right-sidebar has-background-black-bis ${
               this.state.rightBarOpen ? '' : 'hidden'
             }`}
           >

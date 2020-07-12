@@ -1,6 +1,8 @@
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import './stylesheets/style.scss';
+import './stylesheets/animista.scss';
+
 import { Root } from './Root';
 import { KeyRing, Client, Utils } from 'libvex';
 
