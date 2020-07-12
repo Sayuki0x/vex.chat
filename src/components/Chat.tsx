@@ -95,7 +95,7 @@ export class Chat extends Component<Props, State> {
     }
 
     if (widthHistory[0] >= 769 && innerWidth < 769) {
-      this.closeLeftBar();
+      this.closeLeftBar(true);
     }
 
     if (widthHistory[0] <= 1024 && innerWidth > 1024) {
@@ -103,7 +103,7 @@ export class Chat extends Component<Props, State> {
     }
 
     if (widthHistory[0] >= 1024 && innerWidth < 1024) {
-      this.closeRightBar();
+      this.closeRightBar(true);
     }
 
     widthHistory.unshift(innerWidth);
@@ -280,8 +280,8 @@ export class Chat extends Component<Props, State> {
     });
   }
 
-  closeRightBar() {
-    if (this.state.viewportWidth > 1024) {
+  closeRightBar(bypass: boolean = true) {
+    if (this.state.viewportWidth > 1024 && !bypass) {
       return;
     }
     this.setState({
@@ -298,8 +298,8 @@ export class Chat extends Component<Props, State> {
     });
   }
 
-  closeLeftBar() {
-    if (this.state.viewportWidth > 769) {
+  closeLeftBar(bypass: boolean = true) {
+    if (this.state.viewportWidth > 769 && !bypass) {
       return;
     }
     this.setState({
