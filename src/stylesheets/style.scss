@@ -29,6 +29,10 @@ html {
   overflow-y: hidden;
 }
 
+.has-text-mgrey {
+  color: $grey-darker;
+}
+
 ::placeholder {
   /* Chrome, Firefox, Opera, Safari 10.1+ */
   color: $grey-darker !important;

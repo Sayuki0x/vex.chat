@@ -453,7 +453,14 @@ export class Chat extends Component<Props, State> {
               <div className="Aligner">
                 <div className="Aligner-item Aligner-item--top"></div>
                 <div className="Aligner-item">
-                  <FontAwesomeIcon icon={faBars} />
+                  <FontAwesomeIcon
+                    icon={faBars}
+                    className={`${
+                      this.state.leftBarOpen
+                        ? 'has-text-white'
+                        : 'has-text-grey-darker'
+                    }`}
+                  />
                 </div>
                 <div className="Aligner-item Aligner-item--bottom"></div>
               </div>
@@ -496,7 +503,14 @@ export class Chat extends Component<Props, State> {
               <div className="Aligner">
                 <div className="Aligner-item Aligner-item--top"></div>
                 <div className="Aligner-item">
-                  <FontAwesomeIcon icon={faUsers} />
+                  <FontAwesomeIcon
+                    icon={faUsers}
+                    className={`${
+                      this.state.rightBarOpen
+                        ? 'has-text-white'
+                        : 'has-text-grey-darker'
+                    }`}
+                  />
                 </div>
                 <div className="Aligner-item Aligner-item--bottom"></div>
               </div>
