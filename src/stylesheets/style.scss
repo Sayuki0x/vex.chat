@@ -179,7 +179,7 @@ input {
 }
 
 .chat-message-wrapper {
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 @media screen and (max-width: $desktop) {
