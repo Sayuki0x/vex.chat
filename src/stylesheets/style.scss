@@ -24,6 +24,11 @@ body {
   background-color: $black-ter !important;
 }
 
+html {
+  background-color: $black-ter !important;
+  overflow-y: hidden;
+}
+
 ::placeholder {
   /* Chrome, Firefox, Opera, Safari 10.1+ */
   color: $grey-darker !important;
@@ -173,7 +178,7 @@ input {
   height: 100%; /* Full-height: remove this if you want "auto" height */
   width: 250px; /* Set the width of the sidebar */
   position: fixed; /* Fixed Sidebar (stay in place on scroll) */
-  z-index: 1; /* Stay on top */
+  z-index: 2; /* Stay on top */
   top: 50px; /* Stay at the top */
   right: 0;
   overflow-x: hidden; /* Disable horizontal scroll */
@@ -181,22 +186,6 @@ input {
 
 .chat-message-wrapper {
   overflow-x: hidden;
-}
-
-@media screen and (max-width: $desktop) {
-  .chat-window {
-    width: calc(100% - 80px - 263px) !important;
-    right: 0 !important;
-  }
-
-  .bottom-bar {
-    width: calc(100% - 80px - 263px) !important;
-    right: 0 !important;
-  }
-
-  .channel-name-wrapper {
-    width: calc(100% - 100px) !important;
-  }
 }
 
 .hidden {
@@ -221,56 +210,6 @@ input {
   width: 25px;
   right: 0;
   z-index: 222;
-}
-
-@media screen and (max-width: $tablet) {
-  .right-sidebar {
-    z-index: 4 !important;
-    right: 0 !important;
-    top: 0 !important;
-    height: 100% !important;
-  }
-
-  .left-channelbar {
-    height: 100% !important;
-    top: 0 !important;
-    left: 0 !important;
-    z-index: 3 !important;
-  }
-
-  .top-bar-left {
-    display: none !important;
-  }
-
-  .top-bar-right {
-    width: 100% !important;
-    left: 0 !important;
-  }
-
-  .chat-window {
-    width: 100% !important;
-    left: 0 !important;
-  }
-
-  .bottom-bar {
-    width: 100% !important;
-    left: 0 !important;
-  }
-
-  .top-bar {
-    width: 100% !important;
-  }
-}
-
-/* The sidebar menu */
-.left-sidebar {
-  height: 100%; /* Full-height: remove this if you want "auto" height */
-  width: 80px; /* Set the width of the sidebar */
-  position: fixed; /* Fixed Sidebar (stay in place on scroll) */
-  z-index: 1; /* Stay on top */
-  top: 0; /* Stay at the top */
-  left: 0;
-  overflow-x: hidden; /* Disable horizontal scroll */
 }
 
 .top-bar-left {
@@ -303,9 +242,9 @@ input {
   ); /* Full-height: remove this if you want "auto" height */
   width: 263px; /* Set the width of the sidebar */
   position: fixed; /* Fixed Sidebar (stay in place on scroll) */
-  z-index: 1; /* Stay on top */
+  z-index: 2; /* Stay on top */
   top: 50px; /* Stay at the top */
-  left: 80px;
+  left: 0px;
   overflow-x: hidden; /* Disable horizontal scroll */
 }
 
@@ -341,12 +280,14 @@ input {
 /* The top menu */
 .top-bar {
   height: 50px; /* Full-height: remove this if you want "auto" height */
-  width: calc(100% - 80px); /* Set the width of the sidebar */
+  width: 100%; /* Set the width of the sidebar */
   position: fixed; /* Fixed Sidebar (stay in place on scroll) */
   z-index: 1; /* Stay on top */
   top: 0; /* Stay at the top */
   right: 0px;
   overflow-x: hidden; /* Disable horizontal scroll */
+  background-color: $black-bis;
+  border-bottom: 2px $black-ter solid;
 }
 
 .role-icon {
@@ -361,27 +302,45 @@ input {
 .bottom-bar {
   padding: 20px;
   height: 100px; /* Full-height: remove this if you want "auto" height */
-  width: calc(100% - 80px - 263px - 250px); /* Set the width of the sidebar */
   position: fixed; /* Fixed Sidebar (stay in place on scroll) */
   z-index: 1; /* Stay on top */
   bottom: 0; /* Stay at the top */
-  right: 250px;
   overflow-x: hidden; /* Disable horizontal scroll */
   // border-top: $black 3px solid;
 }
 
 /* The sidebar menu */
 .chat-window {
-  padding: 20px;
   height: calc(
     100% - 50px - 100px
   ); /* Full-height: remove this if you want "auto" height */
-  width: calc(100% - 80px - 263px - 250px); /* Set the width of the sidebar */
   position: fixed; /* Fixed Sidebar (stay in place on scroll) */
   z-index: 1; /* Stay on top */
   top: 50px; /* Stay at the top */
-  right: 250px;
   overflow-x: hidden; /* Disable horizontal scroll */
+  // this looks terrible
+}
+
+.chat-window-loro {
+  width: calc(100% - 263px - 250px); /* Set the width of the sidebar */
+  right: 250px;
+}
+
+.chat-window-lcro {
+  width: calc(100% - 250px); /* Set the width of the sidebar */
+  right: 250px;
+  left: 0px;
+}
+
+.chat-window-lorc {
+  width: calc(100% - 250px); /* Set the width of the sidebar */
+  right: 250px;
+  left: 263px;
+}
+
+.chat-window-lcrc {
+  width: 100%;
+  left: 0;
 }
 
 .chat-message-wrapper {
@@ -389,6 +348,8 @@ input {
   flex-direction: column;
   height: 100%;
   width: 100%;
+  margin-left: 20px;
+  padding-right: 20px;
 }
 .chat-messages {
   flex: 1;

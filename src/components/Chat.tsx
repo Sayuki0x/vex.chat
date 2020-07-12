@@ -33,6 +33,26 @@ const uniqueArray = (arr: any[]) => {
   });
 };
 
+const chatWindowSize = (
+  leftOpen: boolean,
+  rightOpen: boolean,
+  viewportWidth: number
+): string => {
+  if (viewportWidth > desktop) {
+    return `chat-window-l${leftOpen ? 'o' : 'c'}r${rightOpen ? 'o' : 'c'}`;
+  }
+
+  if (viewportWidth > tablet) {
+    return `chat-window-l${leftOpen ? 'o' : 'c'}rc`;
+  }
+
+  if (viewportWidth <= tablet) {
+    return 'chat-window-lcrc';
+  }
+
+  return '';
+};
+
 const tablet = 769;
 const desktop = 1024;
 
@@ -69,8 +89,8 @@ export class Chat extends Component<Props, State> {
       clientInfo: client.info(),
       inputValue: '',
       onlineLists: {},
-      leftBarAnimation: "",
-      rightBarAnimation: "",
+      leftBarAnimation: '',
+      rightBarAnimation: '',
       modalIsActive: false,
       modalContents: <span />,
       joinedRooms: [],
@@ -88,8 +108,26 @@ export class Chat extends Component<Props, State> {
     this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
     this.openRightBar = this.openRightBar.bind(this);
     this.closeRightBar = this.closeRightBar.bind(this);
+    this.toggleRightBar = this.toggleRightBar.bind(this);
     this.openLeftBar = this.openLeftBar.bind(this);
     this.closeLeftBar = this.closeLeftBar.bind(this);
+    this.toggleLeftBar = this.toggleLeftBar.bind(this);
+  }
+
+  toggleRightBar() {
+    if (this.state.rightBarOpen) {
+      this.closeRightBar();
+    } else {
+      this.openRightBar();
+    }
+  }
+
+  toggleLeftBar() {
+    if (this.state.leftBarOpen) {
+      this.closeLeftBar();
+    } else {
+      this.openLeftBar();
+    }
   }
 
   updateWindowDimensions() {
@@ -290,53 +328,63 @@ export class Chat extends Component<Props, State> {
   }
 
   closeRightBar() {
-    this.setState({
-      rightBarAnimation: "slide-out-right",
-    }, async () => {
-      await Utils.sleep(500);
-      this.setState({
-        rightBarOpen: false,
-        rightBarAnimation: "",
-      })
-    });
+    this.setState(
+      {
+        rightBarAnimation: 'slide-out-right',
+      },
+      async () => {
+        await Utils.sleep(500);
+        this.setState({
+          rightBarOpen: false,
+          rightBarAnimation: '',
+        });
+      }
+    );
   }
 
   openRightBar() {
-    this.setState({
-      rightBarAnimation: "slide-in-right",
-      rightBarOpen: true,
-    }, async () => {
-      await Utils.sleep(500);
-      this.setState({
-        rightBarAnimation: "",
-      });
-    })
-    
+    this.setState(
+      {
+        rightBarAnimation: 'slide-in-right',
+        rightBarOpen: true,
+      },
+      async () => {
+        await Utils.sleep(500);
+        this.setState({
+          rightBarAnimation: '',
+        });
+      }
+    );
   }
 
   closeLeftBar() {
-    this.setState({
-      leftBarAnimation: "slide-out-left",
-    }, async () => {
-      await Utils.sleep(500);
-      this.setState({
-        leftBarOpen: false,
-        leftBarAnimation: "",
-      })
-    });
+    this.setState(
+      {
+        leftBarAnimation: 'slide-out-left',
+      },
+      async () => {
+        await Utils.sleep(500);
+        this.setState({
+          leftBarOpen: false,
+          leftBarAnimation: '',
+        });
+      }
+    );
   }
 
   openLeftBar() {
-    this.setState({
-      leftBarAnimation: "slide-in-left",
-      leftBarOpen: true,
-    }, async () => {
-      await Utils.sleep(500);
-      this.setState({
-        leftBarAnimation: "",
-      });
-    })
-    
+    this.setState(
+      {
+        leftBarAnimation: 'slide-in-left',
+        leftBarOpen: true,
+      },
+      async () => {
+        await Utils.sleep(500);
+        this.setState({
+          leftBarAnimation: '',
+        });
+      }
+    );
   }
 
   render() {
@@ -394,24 +442,12 @@ export class Chat extends Component<Props, State> {
             }}
           />
         </div>
-
-        <div
-          id="serverBar"
-          className="left-sidebar has-background-black-ter"
-        ></div>
         <div className="top-bar">
-          <div className="top-bar-left has-background-black-bis">
-            <h1 className="title is-size-4 has-text-white">
-              {this.state.clientInfo.host.split('//')[1]}
-            </h1>
-          </div>
-          <div className="top-bar-right has-background-black-ter">
+          <div className={`has-background-black-ter`}>
             <div
-              className={`mobile-menu-toggle-wrapper ${
-                this.state.viewportWidth > tablet ? 'hidden' : ''
-              }`}
+              className={`mobile-menu-toggle-wrapper`}
               onClick={() => {
-                this.openLeftBar();
+                this.toggleLeftBar();
               }}
             >
               <div className="Aligner">
@@ -451,22 +487,20 @@ export class Chat extends Component<Props, State> {
                 <div className="Aligner-item Aligner-item--bottom"></div>
               </div>
             </div>
-            {this.state.viewportWidth < desktop && (
-              <div
-                className="user-menu-toggle-wrapper"
-                onClick={() => {
-                  this.openRightBar();
-                }}
-              >
-                <div className="Aligner">
-                  <div className="Aligner-item Aligner-item--top"></div>
-                  <div className="Aligner-item">
-                    <FontAwesomeIcon icon={faUsers} />
-                  </div>
-                  <div className="Aligner-item Aligner-item--bottom"></div>
+            <div
+              className="user-menu-toggle-wrapper"
+              onClick={() => {
+                this.toggleRightBar();
+              }}
+            >
+              <div className="Aligner">
+                <div className="Aligner-item Aligner-item--top"></div>
+                <div className="Aligner-item">
+                  <FontAwesomeIcon icon={faUsers} />
                 </div>
+                <div className="Aligner-item Aligner-item--bottom"></div>
               </div>
-            )}
+            </div>
           </div>
         </div>
         <Swipeable
@@ -479,7 +513,9 @@ export class Chat extends Component<Props, State> {
         >
           <div
             id="channelBar"
-            className={`${this.state.leftBarAnimation} left-channelbar has-background-black-bis ${
+            className={`${
+              this.state.leftBarAnimation
+            } left-channelbar has-background-black-bis ${
               this.state.leftBarOpen ? '' : 'hidden'
             }`}
           >
@@ -487,19 +523,6 @@ export class Chat extends Component<Props, State> {
               <p className="menu-label">
                 <span className="menu-title-wrapper">Channels</span>
                 <span className="icon-group">
-                  {this.state.viewportWidth < tablet && (
-                    <span
-                      className="close-button-wrapper"
-                      onClick={() => {
-                        this.closeLeftBar();
-                      }}
-                    >
-                      <FontAwesomeIcon
-                        icon={faTimes}
-                        className={'has-text-red'}
-                      />
-                    </span>
-                  )}
                   {client.info().client &&
                     client.info().client!.powerLevel >
                       client.info().powerLevels.create && (
@@ -785,7 +808,13 @@ export class Chat extends Component<Props, State> {
             </div>
           </div>
         </Swipeable>
-        <div className="chat-window has-background-black-ter">
+        <div
+          className={`${chatWindowSize(
+            this.state.leftBarOpen,
+            this.state.rightBarOpen,
+            this.state.viewportWidth
+          )} chat-window has-background-black-ter`}
+        >
           <div className="chat-message-wrapper">
             {chunkedArray.map((messages) => {
               if (messages.length === 0) return null;
@@ -932,7 +961,13 @@ export class Chat extends Component<Props, State> {
             ></div>
           </div>
         </div>
-        <div className="bottom-bar has-background-black-ter">
+        <div
+          className={`${chatWindowSize(
+            this.state.leftBarOpen,
+            this.state.rightBarOpen,
+            this.state.viewportWidth
+          )} bottom-bar has-background-black-ter`}
+        >
           <div className="chat-input-wrapper has-background-grey-darker">
             <textarea
               className="chat-input"
@@ -972,21 +1007,13 @@ export class Chat extends Component<Props, State> {
         >
           <div
             id="onlineUserBar"
-            className={`${this.state.rightBarAnimation} right-sidebar has-background-black-bis ${
+            className={`${
+              this.state.rightBarAnimation
+            } right-sidebar has-background-black-bis ${
               this.state.rightBarOpen ? '' : 'hidden'
             }`}
           >
             <aside className="menu">
-              {this.state.viewportWidth < desktop && (
-                <span
-                  className="close-button-wrapper"
-                  onClick={() => {
-                    this.closeRightBar();
-                  }}
-                >
-                  <FontAwesomeIcon icon={faTimes} className={'has-text-red'} />
-                </span>
-              )}
               <p className="menu-label">Online</p>
               <ul className="menu-list">
                 {this.state.onlineLists[this.props.match.params.id] &&
