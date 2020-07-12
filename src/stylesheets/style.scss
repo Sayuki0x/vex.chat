@@ -178,6 +178,10 @@ input {
   overflow-x: hidden; /* Disable horizontal scroll */
 }
 
+.chat-message-wrapper {
+  overflow: hidden;
+}
+
 @media screen and (max-width: $desktop) {
   .chat-window {
     width: calc(100% - 80px - 263px) !important;
