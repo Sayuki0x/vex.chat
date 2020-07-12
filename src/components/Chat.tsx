@@ -690,10 +690,7 @@ export class Chat extends Component<Props, State> {
                               {message.message}
                             </p>
                           ) : (
-                            <ReactMarkdown
-                              source={message.message}
-                              linkTarget={'_blank'}
-                            />
+                            <ReactMarkdown source={message.message} linkTarget={"_blank"} />
                           )}
                         </span>
                       ))}
