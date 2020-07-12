@@ -670,7 +670,9 @@ export class Chat extends Component<Props, State> {
                       <span
                         className="user-bar-cog-wrapper"
                         onClick={async () => {
-                          this.closeLeftBar();
+                          if (this.state.viewportWidth > 769) {
+                            this.closeLeftBar();
+                          }
                           this.openModal(
                             await userProfile(client.info().client!.userID)
                           );
