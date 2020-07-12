@@ -95,7 +95,7 @@ export class Chat extends Component<Props, State> {
     }
 
     if (widthHistory[0] >= 769 && innerWidth < 769) {
-      this.closeLeftBar(true);
+      this.closeLeftBar();
     }
 
     if (widthHistory[0] <= 1024 && innerWidth > 1024) {
@@ -103,7 +103,7 @@ export class Chat extends Component<Props, State> {
     }
 
     if (widthHistory[0] >= 1024 && innerWidth < 1024) {
-      this.closeRightBar(true);
+      this.closeRightBar();
     }
 
     widthHistory.unshift(innerWidth);
@@ -280,37 +280,25 @@ export class Chat extends Component<Props, State> {
     });
   }
 
-  closeRightBar(bypass: boolean = true) {
-    if (this.state.viewportWidth > 1024 && !bypass) {
-      return;
-    }
+  closeRightBar() {
     this.setState({
       rightBarOpen: false,
     });
   }
 
   openRightBar() {
-    if (this.state.viewportWidth > 1024) {
-      return;
-    }
     this.setState({
       rightBarOpen: true,
     });
   }
 
-  closeLeftBar(bypass: boolean = true) {
-    if (this.state.viewportWidth > 769 && !bypass) {
-      return;
-    }
+  closeLeftBar() {
     this.setState({
       leftBarOpen: false,
     });
   }
 
   openLeftBar() {
-    if (this.state.viewportWidth > 769) {
-      return;
-    }
     this.setState({
       leftBarOpen: true,
     });
@@ -405,6 +393,9 @@ export class Chat extends Component<Props, State> {
         </div>
         <Swipeable
           onSwipedLeft={(eventData) => {
+            if (this.state.viewportWidth > 769) {
+              return;
+            }
             this.closeLeftBar();
           }}
         >
@@ -874,6 +865,9 @@ export class Chat extends Component<Props, State> {
         </div>
         <Swipeable
           onSwipedRight={(eventData) => {
+            if (this.state.viewportWidth > 1024) {
+              return;
+            }
             this.closeRightBar();
           }}
         >
