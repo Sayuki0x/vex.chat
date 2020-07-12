@@ -455,12 +455,8 @@ export class Chat extends Component<Props, State> {
           >
             <aside className="menu">
               <p className="menu-label">
-                <span className="menu-title-wrapper">Channels</span>
-                {client.info().client &&
-                  client.info().client!.powerLevel >
-                    client.info().powerLevels.create && (
-                    <span className="icon-group">
-                      {this.state.viewportWidth < tablet && (
+
+              {this.state.viewportWidth < tablet && (
                       <span
                       className="close-button-wrapper"
                       onClick={() => {
@@ -473,6 +469,12 @@ export class Chat extends Component<Props, State> {
                       />
                     </span>
                       )}
+
+                <span className="menu-title-wrapper">Channels</span>
+                {client.info().client &&
+                  client.info().client!.powerLevel >
+                    client.info().powerLevels.create && (
+                    <span className="icon-group">
                       <span
                         className="menu-button-wrapper"
                         onClick={() => {

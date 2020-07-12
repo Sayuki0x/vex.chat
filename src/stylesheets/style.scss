@@ -192,6 +192,11 @@ input {
     width: calc(100% - 80px - 263px) !important;
     right: 0 !important;
   }
+
+
+  .channel-name-wrapper {
+    width: calc(100% - 100px) !important;
+  }
 }
 
 .hidden {
@@ -329,7 +334,7 @@ input {
 .channel-name-wrapper {
   position: absolute;
   height: 100%;
-  width: calc(100% - 100px);
+  width: calc(100% - 100px - 250px);
   left: 50px;
   top: 0;
 }
