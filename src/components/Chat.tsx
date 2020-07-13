@@ -1037,14 +1037,13 @@ export class Chat extends Component<Props, State> {
                   if (this.state.inputValue === '') {
                     return;
                   }
-
+                  this.setState({
+                    inputValue: '',
+                  });
                   await client.messages.send(
                     this.props.match.params.id,
                     this.state.inputValue
                   );
-                  this.setState({
-                    inputValue: '',
-                  });
                 }
               }}
             />
