@@ -31,6 +31,7 @@ export class HistoryManager extends EventEmitter {
   }
 
   private addMessage(message: IChatMessage) {
+    (message as any).markdown = new ReactMarkdown({ source: message.message });
     const { channelID, userID, username } = message;
     //   [history]       [channel]
     if (!this.chatHistory[channelID]) {
@@ -97,7 +98,7 @@ export class HistoryManager extends EventEmitter {
   private init() {
     client.on('message', async (message) => {
       await this.addMessage(message);
-      this.emit('message');
+      this.emit('message', message);
     });
   }
 }

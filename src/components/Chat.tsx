@@ -232,10 +232,14 @@ export class Chat extends Component<Props, State> {
       });
     });
 
-    this.historyManager.on('message', async () => {
-      this.setState({
-        chatHistory: this.historyManager.getHistory(this.props.match.params.id),
-      });
+    this.historyManager.on('message', async (message: IChatMessage) => {
+      if (message.channelID === this.currentChannel) {
+        this.setState({
+          chatHistory: this.historyManager.getHistory(
+            this.props.match.params.id
+          ),
+        });
+      }
     });
   }
 
