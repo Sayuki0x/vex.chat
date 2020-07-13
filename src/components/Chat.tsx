@@ -990,7 +990,8 @@ export class Chat extends Component<Props, State> {
                                     </span>
                                   ) : (
                                     <span className="chat-message-text">
-                                      {message.message}
+                                      {(message as any).markdown ||
+                                        message.message}
                                     </span>
                                   )}
                                 </span>

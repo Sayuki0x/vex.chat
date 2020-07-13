@@ -1,6 +1,7 @@
 import { IChatMessage, IChannel } from 'libvex';
 import { client } from '../App';
 import { EventEmitter } from 'events';
+import ReactMarkdown from 'react-markdown';
 
 export class HistoryManager extends EventEmitter {
   chatHistory: Record<string, IChatMessage[][]>;
@@ -68,6 +69,7 @@ export class HistoryManager extends EventEmitter {
     const chunked: IChatMessage[][] = [[]];
     let rowCount = 0;
     for (const post of posts) {
+      (post as any).markdown = new ReactMarkdown({ source: post.message });
       if (!chunked[rowCount]) {
         chunked.push([]);
       }
