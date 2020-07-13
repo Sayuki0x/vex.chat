@@ -31,22 +31,19 @@ export class HistoryManager extends EventEmitter {
   }
 
   private addMessage(message: IChatMessage) {
-    (message as any).markdown = new ReactMarkdown({ source: message.message });
+    (message as any).markdown = new ReactMarkdown({ source: message.message, linkTarget: "_blank" });
     const { channelID, userID, username } = message;
-    //   [history]       [channel]
     if (!this.chatHistory[channelID]) {
       this.chatHistory[channelID] = [[]];
     }
-    //  [history]       [channel]  [top-row]
     if (
       this.chatHistory[channelID][this.chatHistory[channelID].length - 1]
-        .length == 0
+        .length === 0
     ) {
       this.chatHistory[channelID][this.chatHistory[channelID].length - 1].push(
         message
       );
     }
-    //  [history]       [channel]  [top-row]                               [top-message]                                                                   .userID
     if (
       this.chatHistory[channelID][this.chatHistory[channelID].length - 1][
         this.chatHistory[channelID][this.chatHistory[channelID].length - 1]
@@ -70,7 +67,7 @@ export class HistoryManager extends EventEmitter {
     const chunked: IChatMessage[][] = [[]];
     let rowCount = 0;
     for (const post of posts) {
-      (post as any).markdown = new ReactMarkdown({ source: post.message });
+      (post as any).markdown = new ReactMarkdown({ source: post.message, linkTarget: "_blank" });
       if (!chunked[rowCount]) {
         chunked.push([]);
       }

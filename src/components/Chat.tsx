@@ -433,9 +433,6 @@ export class Chat extends Component<Props, State> {
       >
         <Swipeable
           onSwipedRight={(eventData) => {
-            if (this.state.viewportWidth > tablet) {
-              return;
-            }
             this.openLeftBar();
           }}
         >
@@ -550,9 +547,6 @@ export class Chat extends Component<Props, State> {
         </div>
         <Swipeable
           onSwipedLeft={(eventData) => {
-            if (this.state.viewportWidth > tablet) {
-              return;
-            }
             this.closeLeftBar();
           }}
         >
@@ -1078,9 +1072,6 @@ export class Chat extends Component<Props, State> {
         </div>
         <Swipeable
           onSwipedRight={(eventData) => {
-            if (this.state.viewportWidth > desktop) {
-              return;
-            }
             this.closeRightBar();
           }}
         >
