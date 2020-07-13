@@ -3,9 +3,8 @@
 import React, { Component, Fragment } from 'react';
 import { IChannel, IClientInfo, IChatMessage, IUser, Utils } from 'libvex';
 import { client } from '../App';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import { getUserColor, getUserHexTag } from '../utils/getUserColor';
-import ReactMarkdown from 'react-markdown';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 import { Swipeable } from 'react-swipeable';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -73,6 +72,7 @@ type State = {
   viewportHeight: number;
   widthHistory: number[];
   leftBarOpen: boolean;
+  redirect: string | null;
   rightBarOpen: boolean;
   leftBarClosing: boolean;
   rightBarClosing: boolean;
@@ -100,6 +100,7 @@ export class Chat extends Component<Props, State> {
       modalIsActive: false,
       modalContents: <span />,
       joinedRooms: [],
+      redirect: null,
       viewportWidth: window.innerWidth,
       viewportHeight: window.innerHeight,
       widthHistory: [window.innerWidth],
@@ -174,8 +175,19 @@ export class Chat extends Component<Props, State> {
   }
 
   componentDidMount() {
+    if (
+      !this.props.match.params.id &&
+      !this.props.match.params.resourceType &&
+      localStorage.getItem('currentChannel')
+    ) {
+      this.setState({
+        redirect: `/channel/${localStorage.getItem('currentChannel')!}`,
+      });
+    }
+
     if (this.props.match.params.id) {
       this.currentChannel = this.props.match.params.id;
+      localStorage.setItem('currentChannel', this.props.match.params.id);
     }
     window.addEventListener('resize', this.updateWindowDimensions);
     client.on('authed', async () => {
@@ -258,7 +270,9 @@ export class Chat extends Component<Props, State> {
   }
 
   scrollToBottom = () => {
-    this.messagesEnd.current.scrollIntoView({});
+    if (this.messagesEnd.current) {
+      this.messagesEnd.current.scrollIntoView({});
+    }
   };
 
   chunkPosts = (posts: IChatMessage[]) => {
@@ -400,6 +414,15 @@ export class Chat extends Component<Props, State> {
   }
 
   render() {
+    const redirectPath = this.state.redirect;
+    if (redirectPath) {
+      this.setState({
+        redirect: null,
+      });
+
+      return <Redirect to={redirectPath} />;
+    }
+
     return (
       <div
         onKeyDown={(event) => {
