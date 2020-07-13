@@ -832,11 +832,25 @@ export class Chat extends Component<Props, State> {
           </div>
         </Swipeable>
 
-
         <Dropzone onDrop={acceptedFiles => {
-          console.log(acceptedFiles)}
-          }>
+          const reader = new FileReader();
+          reader.onload = async (event) => {
+            console.log();
+            const file = event.target?.result;
+            if (file) {
+              const view = new Uint8Array((file as ArrayBuffer))
+              const uploadedFileInfo = await client.files.create(Utils.toHexString(view), acceptedFiles[0].name, this.props.match.params.id)
+              await client.messages.send(this.props.match.params.id, uploadedFileInfo.url)
+            }
+          };
+          reader.onerror = (error) => {
+            throw error;
+          };
+          reader.readAsArrayBuffer(acceptedFiles[0]);
+        }}>
   {({getRootProps, getInputProps}) => (
+    <section>
+      <div {...getRootProps()}>
         <div
         className={`${chatWindowSize(
           this.state.leftBarOpen,
@@ -984,16 +998,21 @@ export class Chat extends Component<Props, State> {
               </article>
             );
           })}
+
           <div
             style={{ float: 'left', clear: 'both' }}
             ref={this.messagesEnd}
           ></div>
+
+          
         </div>
       </div>
+
+
+      </div>
+    </section>
   )}
 </Dropzone>
-
-
 
         <div
           className={`${chatWindowSize(
