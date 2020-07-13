@@ -234,7 +234,7 @@ export class Chat extends Component<Props, State> {
       }
       chatHistory[message.channelID].push(message);
 
-      if (chatHistory[message.channelID].length > 500) {
+      if (chatHistory[message.channelID].length > 100) {
         chatHistory[message.channelID].shift();
       }
 
