@@ -1,6 +1,6 @@
 {
-  "short_name": "conflux",
-  "name": "conflux",
+  "short_name": "vex",
+  "name": "vex.chat",
   "icons": [
     {
       "src": "favicon.svg",
@@ -19,6 +19,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#f92672",
+  "theme_color": "#1e1f1c",
   "background_color": "#080808"
 }
