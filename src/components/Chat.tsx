@@ -433,7 +433,9 @@ export class Chat extends Component<Props, State> {
       >
         <Swipeable
           onSwipedRight={(eventData) => {
-            this.openLeftBar();
+            if (!this.state.leftBarOpen) {
+              this.openLeftBar();
+            }
           }}
         >
           {' '}
@@ -442,7 +444,9 @@ export class Chat extends Component<Props, State> {
 
         <Swipeable
           onSwipedLeft={(eventData) => {
-            this.openRightBar();
+            if (!this.state.rightBarOpen) {
+              this.openRightBar();
+            }
           }}
         >
           {' '}
