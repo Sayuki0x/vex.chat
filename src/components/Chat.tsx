@@ -9,7 +9,7 @@ import ReactMarkdown from 'react-markdown';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 import { Swipeable } from 'react-swipeable';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Dropzone from 'react-dropzone'
+import Dropzone from 'react-dropzone';
 import {
   faPlus,
   faHashtag,
@@ -21,6 +21,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { getUserIcon, userProfile, getAvatar } from './userProfile';
 import { MultiSelect } from './Select';
+import { HistoryManager } from './HistoryManager';
 
 const uniqueArray = (arr: any[]) => {
   return arr.filter((thing: any, index: number) => {
@@ -63,7 +64,7 @@ type State = {
   onlineLists: Record<string, IUser[]>;
   leftBarAnimation: string;
   rightBarAnimation: string;
-  chatHistory: Record<string, IChatMessage[]>;
+  chatHistory: IChatMessage[][];
   inputValue: string;
   modalIsActive: boolean;
   modalContents: JSX.Element;
@@ -83,12 +84,14 @@ type Props = {
 
 export class Chat extends Component<Props, State> {
   messagesEnd: any = React.createRef();
+  historyManager = new HistoryManager();
+  currentChannel = '';
 
   constructor(props: Props) {
     super(props);
     this.state = {
       channelList: [],
-      chatHistory: {},
+      chatHistory: [[]],
       clientInfo: client.info(),
       inputValue: '',
       onlineLists: {},
@@ -171,12 +174,17 @@ export class Chat extends Component<Props, State> {
   }
 
   componentDidMount() {
+    if (this.props.match.params.id) {
+      this.currentChannel = this.props.match.params.id;
+    }
     window.addEventListener('resize', this.updateWindowDimensions);
     client.on('authed', async () => {
       const channelList = await client.channels.retrieve();
       this.setState({
         channelList,
       });
+
+      await this.historyManager.fetchHistory(channelList);
 
       for (const channel of channelList) {
         await client.channels.join(channel.channelID);
@@ -185,13 +193,11 @@ export class Chat extends Component<Props, State> {
         this.setState({
           joinedRooms,
         });
-        const history = await client.messages.retrieve(channel.channelID);
-        const { chatHistory } = this.state;
-        chatHistory[channel.channelID] = history;
-        this.setState({
-          chatHistory,
-        });
       }
+
+      this.setState({
+        chatHistory: this.historyManager.getHistory(this.props.match.params.id),
+      });
 
       this.scrollToBottom();
     });
@@ -209,14 +215,12 @@ export class Chat extends Component<Props, State> {
           this.setState({
             joinedRooms,
           });
-          const history = await client.messages.retrieve(channel.channelID);
-          const { chatHistory } = this.state;
-          chatHistory[channel.channelID] = history;
-          this.setState({
-            chatHistory,
-          });
         }
       }
+
+      this.setState({
+        chatHistory: this.historyManager.getHistory(this.props.match.params.id),
+      });
     });
 
     client.on('onlineList', async (onlineList, channelID) => {
@@ -228,21 +232,10 @@ export class Chat extends Component<Props, State> {
       });
     });
 
-    client.on('message', async (message) => {
-      const { chatHistory } = this.state;
-      if (!chatHistory[message.channelID]) {
-        chatHistory[message.channelID] = [];
-      }
-      chatHistory[message.channelID].push(message);
-
-      if (chatHistory[message.channelID].length > 100) {
-        chatHistory[message.channelID].shift();
-      }
-
+    this.historyManager.on('message', async () => {
       this.setState({
-        chatHistory,
+        chatHistory: this.historyManager.getHistory(this.props.match.params.id),
       });
-      this.scrollToBottom();
     });
   }
 
@@ -251,6 +244,12 @@ export class Chat extends Component<Props, State> {
   }
 
   componentDidUpdate() {
+    if (this.currentChannel !== this.props.match.params.id) {
+      this.currentChannel = this.props.match.params.id;
+      this.setState({
+        chatHistory: this.historyManager.getHistory(this.currentChannel),
+      });
+    }
     this.scrollToBottom();
   }
 
@@ -397,10 +396,6 @@ export class Chat extends Component<Props, State> {
   }
 
   render() {
-    const chunkedArray = this.state.chatHistory[this.props.match.params.id]
-      ? this.chunkPosts(this.state.chatHistory[this.props.match.params.id])
-      : [[]];
-
     return (
       <div
         onKeyDown={(event) => {
@@ -832,187 +827,191 @@ export class Chat extends Component<Props, State> {
           </div>
         </Swipeable>
 
-        <Dropzone onDrop={acceptedFiles => {
-          const reader = new FileReader();
-          reader.onload = async (event) => {
-            console.log();
-            const file = event.target?.result;
-            if (file) {
-              const view = new Uint8Array((file as ArrayBuffer))
-              const uploadedFileInfo = await client.files.create(Utils.toHexString(view), acceptedFiles[0].name, this.props.match.params.id)
-              await client.messages.send(this.props.match.params.id, uploadedFileInfo.url)
-            }
-          };
-          reader.onerror = (error) => {
-            throw error;
-          };
-          reader.readAsArrayBuffer(acceptedFiles[0]);
-        }}>
-  {({getRootProps, getInputProps}) => (
-    <section>
-      <div {...getRootProps()}>
-        <div
-        className={`${chatWindowSize(
-          this.state.leftBarOpen,
-          this.state.rightBarOpen,
-          this.state.viewportWidth
-        )} chat-window has-background-black-ter`}
-      >
-        <div className="chat-message-wrapper">
-          {chunkedArray.map((messages) => {
-            if (messages.length === 0) return null;
-            return (
-              <article
-                className="media chat-message"
-                key={'chat-message-block-' + messages[0].messageID}
-              >
-                <figure className="media-left">
-                  <p className="image is-48x48">
-                    {getAvatar(messages[0].userID)}
-                  </p>
-                </figure>
-                <div className="media-content">
-                  <div>
-                    <ContextMenuTrigger
-                      id={'username-trigger-' + messages[0].messageID}
-                    >
-                      <span
-                        className="message-username has-text-weight-bold"
-                        style={{
-                          color: getUserColor(messages[0].userID),
-                        }}
-                      >
-                        {messages[0].username}
-                        <span className="translucent">
-                          #{getUserHexTag(messages[0].userID)}
-                        </span>
-                      </span>{' '}
-                      <small>
-                        {new Date(messages[0].createdAt).toLocaleTimeString()}
-                      </small>
-                    </ContextMenuTrigger>
-                    <ContextMenu
-                      id={'username-trigger-' + messages[0].messageID}
-                    >
-                      {messages[0].userID ===
-                        client.info().client?.userID && (
-                        <MenuItem
-                          data={messages[0]}
-                          onClick={this.changeNickname}
+        <Dropzone
+          onDrop={(acceptedFiles) => {
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+              console.log();
+              const file = event.target?.result;
+              if (file) {
+                const view = new Uint8Array(file as ArrayBuffer);
+                const uploadedFileInfo = await client.files.create(
+                  Utils.toHexString(view),
+                  acceptedFiles[0].name,
+                  this.props.match.params.id
+                );
+                await client.messages.send(
+                  this.props.match.params.id,
+                  uploadedFileInfo.url
+                );
+              }
+            };
+            reader.onerror = (error) => {
+              throw error;
+            };
+            reader.readAsArrayBuffer(acceptedFiles[0]);
+          }}
+        >
+          {({ getRootProps, getInputProps }) => (
+            <section>
+              <div {...getRootProps()}>
+                <div
+                  className={`${chatWindowSize(
+                    this.state.leftBarOpen,
+                    this.state.rightBarOpen,
+                    this.state.viewportWidth
+                  )} chat-window has-background-black-ter`}
+                >
+                  <div className="chat-message-wrapper">
+                    {this.state.chatHistory.map((messages) => {
+                      if (messages.length === 0) return null;
+                      return (
+                        <article
+                          className="media chat-message"
+                          key={'chat-message-block-' + messages[0].messageID}
                         >
-                          Change Nickname
-                        </MenuItem>
-                      )}
-                      {client.info().client &&
-                        client.info().client!.powerLevel >
-                          client.info().powerLevels.grant && (
-                          <MenuItem
-                            data={messages[0]}
-                            onClick={(e: any, data: any) => {
-                              let selectedValues: any[] = [];
-                              const grantForm = (
-                                <form
-                                  className="large-modal"
-                                  onSubmit={async (event) => {
-                                    event.preventDefault();
-                                    // this.closeModal();
-                                    for (const selection of selectedValues) {
-                                      await client.permissions.create(
-                                        messages[0].userID,
-                                        selection.value
-                                      );
-                                    }
-                                    this.closeModal();
+                          <figure className="media-left">
+                            <p className="image is-48x48">
+                              {getAvatar(messages[0].userID)}
+                            </p>
+                          </figure>
+                          <div className="media-content">
+                            <div>
+                              <ContextMenuTrigger
+                                id={'username-trigger-' + messages[0].messageID}
+                              >
+                                <span
+                                  className="message-username has-text-weight-bold"
+                                  style={{
+                                    color: getUserColor(messages[0].userID),
                                   }}
                                 >
-                                  <p className="has-text-white">
-                                    ADD TO CHANNEL
-                                  </p>
-                                  <br />
-                                  <MultiSelect
-                                    onChange={(
-                                      values: any[],
-                                      action: any
-                                    ) => {
-                                      selectedValues = values;
-                                    }}
-                                  />
-                                  <div className="modal-bottom-strip">
-                                    <div className="buttons is-right">
-                                      <button
-                                        className="button is-danger"
-                                        type="submit"
-                                      >
-                                        Add
-                                      </button>
-                                    </div>
-                                  </div>
-                                </form>
-                              );
-                              this.openModal(grantForm);
-                            }}
-                          >
-                            Add To Channel
-                          </MenuItem>
-                        )}
-                      <MenuItem divider />
-                      <MenuItem
-                        data={messages[0]}
-                        onClick={async (e: any, data: any) => {
-                          this.openModal(
-                            await userProfile(messages[0].userID)
-                          );
-                        }}
-                      >
-                        View Profile
-                      </MenuItem>
-                    </ContextMenu>
-                    {messages.map((message, index) => (
-                      <span
-                        className="chat-message has-text-white"
-                        key={
-                          'chat-message-text-' +
-                          message.messageID +
-                          '-' +
-                          index.toString()
-                        }
-                      >
-                        {' '}
-                        {message.message.charAt(0) === '>' ? (
-                          <span className="has-text-success chat-message-text">
-                            {message.message}
-                          </span>
-                        ) : (
-                          <span className="chat-message-text">
-                            <ReactMarkdown
-                              source={message.message}
-                              linkTarget={'_blank'}
-                            />
-                          </span>
-                        )}
-                      </span>
-                    ))}
+                                  {messages[0].username}
+                                  <span className="translucent">
+                                    #{getUserHexTag(messages[0].userID)}
+                                  </span>
+                                </span>{' '}
+                                <small>
+                                  {new Date(
+                                    messages[0].createdAt
+                                  ).toLocaleTimeString()}
+                                </small>
+                              </ContextMenuTrigger>
+                              <ContextMenu
+                                id={'username-trigger-' + messages[0].messageID}
+                              >
+                                {messages[0].userID ===
+                                  client.info().client?.userID && (
+                                  <MenuItem
+                                    data={messages[0]}
+                                    onClick={this.changeNickname}
+                                  >
+                                    Change Nickname
+                                  </MenuItem>
+                                )}
+                                {client.info().client &&
+                                  client.info().client!.powerLevel >
+                                    client.info().powerLevels.grant && (
+                                    <MenuItem
+                                      data={messages[0]}
+                                      onClick={(e: any, data: any) => {
+                                        let selectedValues: any[] = [];
+                                        const grantForm = (
+                                          <form
+                                            className="large-modal"
+                                            onSubmit={async (event) => {
+                                              event.preventDefault();
+                                              // this.closeModal();
+                                              for (const selection of selectedValues) {
+                                                await client.permissions.create(
+                                                  messages[0].userID,
+                                                  selection.value
+                                                );
+                                              }
+                                              this.closeModal();
+                                            }}
+                                          >
+                                            <p className="has-text-white">
+                                              ADD TO CHANNEL
+                                            </p>
+                                            <br />
+                                            <MultiSelect
+                                              onChange={(
+                                                values: any[],
+                                                action: any
+                                              ) => {
+                                                selectedValues = values;
+                                              }}
+                                            />
+                                            <div className="modal-bottom-strip">
+                                              <div className="buttons is-right">
+                                                <button
+                                                  className="button is-danger"
+                                                  type="submit"
+                                                >
+                                                  Add
+                                                </button>
+                                              </div>
+                                            </div>
+                                          </form>
+                                        );
+                                        this.openModal(grantForm);
+                                      }}
+                                    >
+                                      Add To Channel
+                                    </MenuItem>
+                                  )}
+                                <MenuItem divider />
+                                <MenuItem
+                                  data={messages[0]}
+                                  onClick={async (e: any, data: any) => {
+                                    this.openModal(
+                                      await userProfile(messages[0].userID)
+                                    );
+                                  }}
+                                >
+                                  View Profile
+                                </MenuItem>
+                              </ContextMenu>
+                              {messages.map((message, index) => (
+                                <span
+                                  className="chat-message has-text-white"
+                                  key={
+                                    'chat-message-text-' +
+                                    message.messageID +
+                                    '-' +
+                                    index.toString()
+                                  }
+                                >
+                                  {' '}
+                                  {message.message.charAt(0) === '>' ? (
+                                    <span className="has-text-success chat-message-text">
+                                      {message.message}
+                                    </span>
+                                  ) : (
+                                    <span className="chat-message-text">
+                                      {message.message}
+                                    </span>
+                                  )}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="media-right"></div>
+                        </article>
+                      );
+                    })}
+
+                    <div
+                      style={{ float: 'left', clear: 'both' }}
+                      ref={this.messagesEnd}
+                    ></div>
                   </div>
                 </div>
-                <div className="media-right"></div>
-              </article>
-            );
-          })}
-
-          <div
-            style={{ float: 'left', clear: 'both' }}
-            ref={this.messagesEnd}
-          ></div>
-
-          
-        </div>
-      </div>
-
-
-      </div>
-    </section>
-  )}
-</Dropzone>
+              </div>
+            </section>
+          )}
+        </Dropzone>
 
         <div
           className={`${chatWindowSize(
