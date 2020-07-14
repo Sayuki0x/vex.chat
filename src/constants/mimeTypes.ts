@@ -76,6 +76,7 @@ export const mimeTypes = {
   stream: 'audio/x-qt-stream',
   swf: 'application/x-shockwave-flash',
   svg: 'text/xml-svg',
+  svg2: 'image/svg+xml',
   sgml: 'text/x-sgml',
   sgm: 'text/x-sgml',
   tar: 'application/x-tar',
@@ -100,5 +101,4 @@ const imageTypes = [
   mimeTypes.jpeg,
   mimeTypes.jpg,
   mimeTypes.png,
-  mimeTypes.svg,
 ];

@@ -56,6 +56,7 @@ label {
 
 .chat-message-text {
   display: block;
+  white-space: pre-wrap;
   padding-top: 2px;
 }
 
@@ -235,6 +236,31 @@ input {
   border-bottom: $black-ter 1px solid;
 }
 
+.block-quote-icon {
+  position: relative;
+  width: 10px;
+  left: 0;
+  top: 0;
+}
+
+.block-quote-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.block-quote-wrapper > p {
+  position: relative;
+  left: 20px;
+  top: 0px !important;
+}
+
+.block-quote-wrapper > svg {
+  position: absolute;
+  left: 0px;
+  top: 4px !important;
+}
+
 .top-bar-right {
   position: absolute;
   width: calc(100% - 263px);
@@ -293,6 +319,14 @@ input {
   width: 100%;
   top: 0;
   z-index: -1;
+}
+
+.image-preview-background {
+  position: absolute !important;
+  width: 100% !important;
+  height: 100%;
+  left: 0;
+  top: 0;
 }
 
 /* The top menu */

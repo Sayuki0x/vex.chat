@@ -18,7 +18,11 @@ export class ChatLink extends Component<Props, State> {
 
   render() {
     return (
-      <a href={(this.props as any).href} target={(this.props as any).target}>
+      <a
+        href={(this.props as any).href}
+        rel="noopener noreferrer"
+        target={(this.props as any).target}
+      >
         {this.props.children}
       </a>
     );

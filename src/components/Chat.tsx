@@ -495,7 +495,10 @@ export class Chat extends Component<Props, State> {
             this.state.modalIsActive ? 'is-active' : ''
           } is-clipped`}
         >
-          <div className="modal-background" onClick={this.closeModal}></div>
+          <div
+            className="modal-background image-preview-background"
+            onClick={this.closeModal}
+          ></div>
           <div className="modal-content">
             <div className="box has-background-black modal-window">
               {this.state.modalContents && this.state.modalContents}
@@ -1056,7 +1059,13 @@ export class Chat extends Component<Props, State> {
                                   {' '}
                                   <span className="chat-message-text">
                                     {(message as any).markdown ||
-                                      message.message}
+                                      (message.message.charAt(0) === '>' ? (
+                                        <span className="has-text-success">
+                                          {message.message}
+                                        </span>
+                                      ) : (
+                                        message.message
+                                      ))}
                                   </span>
                                 </span>
                               ))}
@@ -1091,6 +1100,7 @@ export class Chat extends Component<Props, State> {
               style={{ display: 'none' }}
               ref={(ref) => (fileUploadRef = ref)}
               onChange={(fileEvent) => {
+                console.log(fileEvent);
                 if (fileEvent.target && fileEvent.target.files) {
                   console.log(fileEvent.target.files);
                   fileEvent.persist();
@@ -1105,6 +1115,7 @@ export class Chat extends Component<Props, State> {
                         fileEvent.target.files![0].name,
                         this.props.match.params.id
                       );
+                      console.log(fileEvent.target.files![0].type);
                       await client.messages.send(
                         this.props.match.params.id,
                         isImageType(fileEvent.target.files![0].type)
@@ -1139,9 +1150,9 @@ export class Chat extends Component<Props, State> {
                 });
               }}
               onKeyPress={async (event) => {
-                if (event.key === 'Enter') {
+                event.persist();
+                if (event.key === 'Enter' && !event.shiftKey) {
                   event.preventDefault();
-
                   if (this.state.inputValue === '') {
                     return;
                   }

@@ -6,13 +6,12 @@ import { ChatLink } from './ChatLink';
 import { ChatImage } from './ChatImage';
 
 function parseMarkdown(message: IChatMessage) {
-  const disallowedTypes: NodeType[] = [];
+  const disallowedTypes: NodeType[] = ['blockquote'];
   const options = {
     source: message.message,
     linkTarget: '_blank',
     renderers: { link: ChatLink, image: ChatImage },
     disallowedTypes,
-    unwrapDisallowed: true,
   };
   return new ReactMarkdown(options);
 }
@@ -45,7 +44,8 @@ export class HistoryManager extends EventEmitter {
   }
 
   private addMessage(message: IChatMessage) {
-    (message as any).markdown = parseMarkdown(message);
+    (message as any).markdown =
+      message.message.charAt(0) === '>' ? null : parseMarkdown(message);
     const { channelID, userID, username } = message;
     if (!this.chatHistory[channelID]) {
       this.chatHistory[channelID] = [[]];
