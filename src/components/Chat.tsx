@@ -17,6 +17,7 @@ import {
   faCog,
   faBars,
   faUsers,
+  faPaperclip,
 } from '@fortawesome/free-solid-svg-icons';
 import { getUserIcon, userProfile, getAvatar } from './userProfile';
 import { MultiSelect } from './Select';
@@ -414,6 +415,7 @@ export class Chat extends Component<Props, State> {
   }
 
   render() {
+    let fileUploadRef: HTMLInputElement | null = null;
     const redirectPath = this.state.redirect;
     if (redirectPath) {
       this.setState({
@@ -619,7 +621,6 @@ export class Chat extends Component<Props, State> {
                           );
 
                           this.openModal(newChannelForm);
-                          this.closeLeftBar();
                         }}
                       >
                         <FontAwesomeIcon icon={faPlus} />
@@ -633,8 +634,21 @@ export class Chat extends Component<Props, State> {
                     <ContextMenuTrigger
                       id={'channel-list-trigger-' + channel.channelID}
                     >
-                      <li>
-                        <Link to={'/channel/' + channel.channelID}>
+                      <li
+                        className={`channel-list-item ${
+                          channel.channelID === this.props.match.params.id
+                            ? 'is-active'
+                            : ''
+                        }`}
+                      >
+                        <Link
+                          className={`channel-list-link ${
+                            channel.channelID === this.props.match.params.id
+                              ? 'is-active'
+                              : ''
+                          }`}
+                          to={'/channel/' + channel.channelID}
+                        >
                           <FontAwesomeIcon
                             icon={channel.public ? faHashtag : faKey}
                           />
@@ -856,10 +870,10 @@ export class Chat extends Component<Props, State> {
           onDrop={(acceptedFiles) => {
             const reader = new FileReader();
             reader.onload = async (event) => {
-              console.log();
               const file = event.target?.result;
               if (file) {
                 const view = new Uint8Array(file as ArrayBuffer);
+                console.log(view);
                 const uploadedFileInfo = await client.files.create(
                   Utils.toHexString(view),
                   acceptedFiles[0].name,
@@ -1047,6 +1061,45 @@ export class Chat extends Component<Props, State> {
           )} bottom-bar has-background-black-ter`}
         >
           <div className="chat-input-wrapper has-background-grey-darker">
+            <input
+              type="file"
+              style={{ display: 'none' }}
+              ref={(ref) => (fileUploadRef = ref)}
+              onChange={(fileEvent) => {
+                if (fileEvent.target && fileEvent.target.files) {
+                  fileEvent.persist();
+                  const reader = new FileReader();
+                  reader.onload = async (loadEvent) => {
+                    const file = loadEvent.target?.result;
+                    if (file) {
+                      console.log('client', client);
+                      const view = new Uint8Array(file as ArrayBuffer);
+                      const uploadedFileInfo = await client.files.create(
+                        Utils.toHexString(view),
+                        fileEvent.target.files![0].name,
+                        this.props.match.params.id
+                      );
+                      await client.messages.send(
+                        this.props.match.params.id,
+                        uploadedFileInfo.url
+                      );
+                    }
+                  };
+                  reader.onerror = (error) => {
+                    throw error;
+                  };
+                  reader.readAsArrayBuffer(fileEvent.target.files[0]);
+                }
+              }}
+            />
+            <span
+              className="chat-input-attach-button"
+              onClick={() => {
+                fileUploadRef?.click();
+              }}
+            >
+              <FontAwesomeIcon icon={faPaperclip} />
+            </span>
             <textarea
               className="chat-input"
               value={this.state.inputValue}

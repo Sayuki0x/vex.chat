@@ -106,6 +106,7 @@ export const userProfile = async (userID: string) => {
                   ref={(ref) => (uploadRef = ref)}
                   style={{ display: 'none' }}
                   onChange={(event) => {
+                    event.persist();
                     if (event.target.files) {
                       if (event.target.files[0].size !== 128) {
                         console.warn(

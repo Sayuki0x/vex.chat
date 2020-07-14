@@ -16,6 +16,7 @@ $brown: #7b3f00;
 
 $menu-item-hover-background-color: $black-ter;
 $menu-item-hover-color: $white;
+$menu-item-active-background-color: $black-ter;
 
 @import '../../node_modules/bulma/bulma.sass';
 
@@ -252,6 +253,10 @@ input {
   overflow-x: hidden; /* Disable horizontal scroll */
 }
 
+.channel-list-item.is-active {
+  background-color: $black-ter;
+}
+
 .channel-name-text {
   float: left !important;
   width: 100%;
@@ -356,6 +361,7 @@ input {
   margin-left: 20px;
   padding-right: 20px;
 }
+
 .chat-messages {
   flex: 1;
   height: 100%;
@@ -375,10 +381,18 @@ input {
   position: relative;
   width: 100%;
   height: 100%;
-  padding: 10px;
+  padding: 10px 10px 10px 35px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.07),
     0 4px 8px rgba(0, 0, 0, 0.07), 0 8px 16px rgba(0, 0, 0, 0.07),
     0 16px 32px rgba(0, 0, 0, 0.07), 0 32px 64px rgba(0, 0, 0, 0.07);
+}
+
+.chat-input-attach-button {
+  position: absolute;
+  height: 100%;
+  top: 10px;
+  left: 10px;
+  width: 15px;
 }
 
 .searchbar-wrapper {

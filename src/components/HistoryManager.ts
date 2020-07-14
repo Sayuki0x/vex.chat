@@ -3,6 +3,11 @@ import { client } from '../App';
 import { EventEmitter } from 'events';
 import ReactMarkdown from 'react-markdown';
 
+function parseMarkdown(message: IChatMessage) {
+  const options = { source: message.message, linkTarget: '_blank' };
+  return new ReactMarkdown(options);
+}
+
 export class HistoryManager extends EventEmitter {
   chatHistory: Record<string, IChatMessage[][]>;
   constructor() {
@@ -31,7 +36,7 @@ export class HistoryManager extends EventEmitter {
   }
 
   private addMessage(message: IChatMessage) {
-    (message as any).markdown = new ReactMarkdown({ source: message.message, linkTarget: "_blank" });
+    (message as any).markdown = parseMarkdown(message);
     const { channelID, userID, username } = message;
     if (!this.chatHistory[channelID]) {
       this.chatHistory[channelID] = [[]];
@@ -62,30 +67,30 @@ export class HistoryManager extends EventEmitter {
     }
   }
 
-  private chunkPosts(posts: IChatMessage[]) {
+  private chunkPosts(messages: IChatMessage[]) {
     console.log('chunkPosts()');
     const chunked: IChatMessage[][] = [[]];
     let rowCount = 0;
-    for (const post of posts) {
-      (post as any).markdown = new ReactMarkdown({ source: post.message, linkTarget: "_blank" });
+    for (const message of messages) {
+      (message as any).markdown = parseMarkdown(message);
       if (!chunked[rowCount]) {
         chunked.push([]);
       }
       if (chunked[rowCount].length === 0) {
-        chunked[rowCount].push(post);
+        chunked[rowCount].push(message);
         continue;
       }
       if (
         chunked[rowCount][chunked[rowCount].length - 1].userID ===
-          post.userID &&
+          message.userID &&
         chunked[rowCount][chunked[rowCount].length - 1].username ===
-          post.username
+          message.username
       ) {
-        chunked[rowCount].push(post);
+        chunked[rowCount].push(message);
         continue;
       } else {
         chunked.push([]);
-        chunked[rowCount + 1].push(post);
+        chunked[rowCount + 1].push(message);
         rowCount++;
       }
     }
