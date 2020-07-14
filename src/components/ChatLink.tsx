@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import ax from 'axios';
 
 type State = {};
 
