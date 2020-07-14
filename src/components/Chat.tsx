@@ -22,6 +22,7 @@ import {
 import { getUserIcon, userProfile, getAvatar } from './userProfile';
 import { MultiSelect } from './Select';
 import { HistoryManager } from './HistoryManager';
+import { isImageType } from '../constants/mimeTypes';
 
 const uniqueArray = (arr: any[]) => {
   return arr.filter((thing: any, index: number) => {
@@ -147,7 +148,7 @@ export class Chat extends Component<Props, State> {
 
       if (items) {
         for (var i = 0; i < items.length; i++) {
-          if (items[i].type.indexOf('image') !== -1) {
+          if (isImageType(items[i].type)) {
             var blob = items[i].getAsFile();
             var reader = new FileReader();
             reader.onload = async (event) => {
@@ -157,12 +158,12 @@ export class Chat extends Component<Props, State> {
                 console.log(view);
                 const uploadedFileInfo = await client.files.create(
                   Utils.toHexString(view),
-                  "pasted_image",
+                  'user pasted image',
                   this.props.match.params.id
                 );
                 await client.messages.send(
                   this.props.match.params.id,
-                  uploadedFileInfo.url
+                  '![user uploaded image](' + uploadedFileInfo.url + ')'
                 );
               }
             };
@@ -909,7 +910,9 @@ export class Chat extends Component<Props, State> {
                 );
                 await client.messages.send(
                   this.props.match.params.id,
-                  uploadedFileInfo.url
+                  isImageType(acceptedFiles[0].type)
+                    ? '![user uploaded image](' + uploadedFileInfo.url + ')'
+                    : uploadedFileInfo.url
                 );
               }
             };
@@ -1051,16 +1054,10 @@ export class Chat extends Component<Props, State> {
                                   }
                                 >
                                   {' '}
-                                  {message.message.charAt(0) === '>' ? (
-                                    <span className="has-text-success chat-message-text">
-                                      {message.message}
-                                    </span>
-                                  ) : (
-                                    <span className="chat-message-text">
-                                      {(message as any).markdown ||
-                                        message.message}
-                                    </span>
-                                  )}
+                                  <span className="chat-message-text">
+                                    {(message as any).markdown ||
+                                      message.message}
+                                  </span>
                                 </span>
                               ))}
                             </div>
@@ -1095,6 +1092,7 @@ export class Chat extends Component<Props, State> {
               ref={(ref) => (fileUploadRef = ref)}
               onChange={(fileEvent) => {
                 if (fileEvent.target && fileEvent.target.files) {
+                  console.log(fileEvent.target.files);
                   fileEvent.persist();
                   const reader = new FileReader();
                   reader.onload = async (loadEvent) => {
@@ -1109,7 +1107,11 @@ export class Chat extends Component<Props, State> {
                       );
                       await client.messages.send(
                         this.props.match.params.id,
-                        uploadedFileInfo.url
+                        isImageType(fileEvent.target.files![0].type)
+                          ? '![user uploaded image](' +
+                              uploadedFileInfo.url +
+                              ')'
+                          : uploadedFileInfo.url
                       );
                     }
                   };

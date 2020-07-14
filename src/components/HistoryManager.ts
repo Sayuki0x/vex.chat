@@ -1,10 +1,19 @@
 import { IChatMessage, IChannel } from 'libvex';
 import { client } from '../App';
 import { EventEmitter } from 'events';
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown, { NodeType } from 'react-markdown';
+import { ChatLink } from './ChatLink';
+import { ChatImage } from './ChatImage';
 
 function parseMarkdown(message: IChatMessage) {
-  const options = { source: message.message, linkTarget: '_blank' };
+  const disallowedTypes: NodeType[] = [];
+  const options = {
+    source: message.message,
+    linkTarget: '_blank',
+    renderers: { link: ChatLink, image: ChatImage },
+    disallowedTypes,
+    unwrapDisallowed: true,
+  };
   return new ReactMarkdown(options);
 }
 

@@ -21,7 +21,7 @@ $menu-item-active-background-color: $black-ter;
 @import '../../node_modules/bulma/bulma.sass';
 
 a:hover {
-  color: lighten($red, 5%)
+  color: lighten($red, 5%);
 }
 
 body {
