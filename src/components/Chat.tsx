@@ -122,6 +122,7 @@ export class Chat extends Component<Props, State> {
     this.openLeftBar = this.openLeftBar.bind(this);
     this.closeLeftBar = this.closeLeftBar.bind(this);
     this.toggleLeftBar = this.toggleLeftBar.bind(this);
+    this.pasteHandler = this.pasteHandler.bind(this);
   }
 
   toggleRightBar() {
@@ -137,6 +138,38 @@ export class Chat extends Component<Props, State> {
       this.closeLeftBar();
     } else {
       this.openLeftBar();
+    }
+  }
+
+  pasteHandler(e: any) {
+    if (e.clipboardData) {
+      var items = e.clipboardData.items;
+
+      if (items) {
+        for (var i = 0; i < items.length; i++) {
+          if (items[i].type.indexOf('image') !== -1) {
+            var blob = items[i].getAsFile();
+            var reader = new FileReader();
+            reader.onload = async (event) => {
+              const file = event.target?.result;
+              if (file) {
+                const view = new Uint8Array(file as ArrayBuffer);
+                console.log(view);
+                const uploadedFileInfo = await client.files.create(
+                  Utils.toHexString(view),
+                  "pasted_image",
+                  this.props.match.params.id
+                );
+                await client.messages.send(
+                  this.props.match.params.id,
+                  uploadedFileInfo.url
+                );
+              }
+            };
+            reader.readAsArrayBuffer(blob);
+          }
+        }
+      }
     }
   }
 
@@ -191,6 +224,7 @@ export class Chat extends Component<Props, State> {
       localStorage.setItem('currentChannel', this.props.match.params.id);
     }
     window.addEventListener('resize', this.updateWindowDimensions);
+    window.addEventListener('paste', this.pasteHandler);
     client.on('authed', async () => {
       const channelList = await client.channels.retrieve();
       this.setState({
