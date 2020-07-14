@@ -108,6 +108,10 @@ input {
   color: $red !important;
 }
 
+.pointer-cursor {
+  cursor: pointer;
+}
+
 .close-button-wrapper:hover {
   color: lighten($red, 15%) !important;
   cursor: pointer;

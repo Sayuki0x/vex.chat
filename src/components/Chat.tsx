@@ -479,14 +479,14 @@ export class Chat extends Component<Props, State> {
         <div className="top-bar">
           <div className={`has-background-black-ter`}>
             <div
-              className={`mobile-menu-toggle-wrapper`}
+              className={`pointer-cursor mobile-menu-toggle-wrapper`}
               onClick={() => {
                 this.toggleLeftBar();
               }}
             >
               <div className="Aligner">
                 <div className="Aligner-item Aligner-item--top"></div>
-                <div className="Aligner-item">
+                <div className="Aligner-item ">
                   <FontAwesomeIcon
                     icon={faBars}
                     className={`${
@@ -529,7 +529,7 @@ export class Chat extends Component<Props, State> {
               </div>
             </div>
             <div
-              className="user-menu-toggle-wrapper"
+              className="user-menu-toggle-wrapper pointer-cursor"
               onClick={() => {
                 this.toggleRightBar();
               }}
@@ -634,13 +634,7 @@ export class Chat extends Component<Props, State> {
                     <ContextMenuTrigger
                       id={'channel-list-trigger-' + channel.channelID}
                     >
-                      <li
-                        className={`channel-list-item ${
-                          channel.channelID === this.props.match.params.id
-                            ? 'is-active'
-                            : ''
-                        }`}
-                      >
+                      <li className="channel-list-item">
                         <Link
                           className={`channel-list-link ${
                             channel.channelID === this.props.match.params.id
@@ -1093,7 +1087,7 @@ export class Chat extends Component<Props, State> {
               }}
             />
             <span
-              className="chat-input-attach-button"
+              className="chat-input-attach-button pointer-cursor"
               onClick={() => {
                 fileUploadRef?.click();
               }}
