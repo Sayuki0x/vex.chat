@@ -45,8 +45,7 @@ export class HistoryManager extends EventEmitter {
   }
 
   private addMessage(message: IChatMessage) {
-    (message as any).markdown =
-      message.message.charAt(0) === '>' ? null : parseMarkdown(message);
+    (message as any).markdown = parseMarkdown(message);
     const { channelID, userID, username } = message;
     if (!this.chatHistory[channelID]) {
       this.chatHistory[channelID] = [[]];
@@ -78,7 +77,6 @@ export class HistoryManager extends EventEmitter {
   }
 
   private chunkPosts(messages: IChatMessage[]) {
-    console.log('chunkPosts()');
     const chunked: IChatMessage[][] = [[]];
     let rowCount = 0;
     for (const message of messages) {
