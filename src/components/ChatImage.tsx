@@ -19,6 +19,12 @@ export class ChatImage extends Component<Props, State> {
   }
 
   render() {
+    if (this.props.alt.includes('emoji-')) {
+      return (
+        <img src={this.props.src} alt={this.props.alt} className="emoji" />
+      );
+    }
+
     return (
       <Fragment>
         <span

@@ -1034,6 +1034,40 @@ export class Chat extends Component<Props, State> {
                                       Add To Channel
                                     </MenuItem>
                                   )}
+                                <MenuItem
+                                  data={messages[0]}
+                                  onClick={async (e: any, data: any) => {
+                                    const confirmation = (
+                                      <div className="">
+                                        <p className="has-text-white">
+                                          BAN USER{' '}
+                                          {messages[0].username.toUpperCase()}#
+                                          {getUserHexTag(messages[0].userID)}?
+                                        </p>
+                                        <br />
+                                        <div className="modal-bottom-strip">
+                                          <div className="buttons is-right">
+                                            <button
+                                              className="button is-danger"
+                                              onClick={async () => {
+                                                await client.users.ban(
+                                                  messages[0].userID
+                                                );
+                                                this.closeModal();
+                                              }}
+                                            >
+                                              Ban
+                                            </button>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+
+                                    this.openModal(confirmation);
+                                  }}
+                                >
+                                  Ban
+                                </MenuItem>
                                 <MenuItem divider />
                                 <MenuItem
                                   data={messages[0]}
