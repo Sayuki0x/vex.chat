@@ -1059,13 +1059,7 @@ export class Chat extends Component<Props, State> {
                                   {' '}
                                   <span className="chat-message-text">
                                     {(message as any).markdown ||
-                                      (message.message.charAt(0) === '>' ? (
-                                        <span className="has-text-success">
-                                          {message.message}
-                                        </span>
-                                      ) : (
-                                        message.message
-                                      ))}
+                                      message.message}
                                   </span>
                                 </span>
                               ))}

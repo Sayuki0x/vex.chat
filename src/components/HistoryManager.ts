@@ -4,13 +4,14 @@ import { EventEmitter } from 'events';
 import ReactMarkdown, { NodeType } from 'react-markdown';
 import { ChatLink } from './ChatLink';
 import { ChatImage } from './ChatImage';
+import { ChatBlockquote } from './ChatBlockquote';
 
 function parseMarkdown(message: IChatMessage) {
-  const disallowedTypes: NodeType[] = ['blockquote'];
+  const disallowedTypes: NodeType[] = [];
   const options = {
     source: message.message,
     linkTarget: '_blank',
-    renderers: { link: ChatLink, image: ChatImage },
+    renderers: { link: ChatLink, image: ChatImage, blockquote: ChatBlockquote },
     disallowedTypes,
   };
   return new ReactMarkdown(options);
