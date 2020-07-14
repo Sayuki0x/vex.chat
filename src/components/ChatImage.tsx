@@ -49,7 +49,6 @@ export class ChatImage extends Component<Props, State> {
                   });
                 }}
               />
-              <br />
               <a
                 href={this.props.src}
                 rel="noopener noreferrer"
@@ -60,7 +59,6 @@ export class ChatImage extends Component<Props, State> {
             </span>
           </span>
         </span>
-        <br />
         <img
           src={this.props.src}
           alt={this.props.alt}
