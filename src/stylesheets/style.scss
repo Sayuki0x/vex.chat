@@ -20,6 +20,10 @@ $menu-item-active-background-color: $black-ter;
 
 @import '../../node_modules/bulma/bulma.sass';
 
+a:hover {
+  color: lighten($red, 5%)
+}
+
 body {
   color: $white;
   background-color: $black-ter !important;
