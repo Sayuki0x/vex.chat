@@ -46,8 +46,6 @@ export class HistoryManager extends EventEmitter {
       const history = await client.messages.retrieve(channel.channelID);
       this.chatHistory[channel.channelID] = this.chunkPosts(history);
     }
-
-    console.log(this.chatHistory);
   }
 
   private addMessage(message: IChatMessage) {

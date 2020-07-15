@@ -4,7 +4,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 type State = {};
 
-type Props = any;
+type Props = {
+  children: any;
+};
 
 export class ChatBlockquote extends Component<Props, State> {
   state: State;
@@ -15,7 +17,6 @@ export class ChatBlockquote extends Component<Props, State> {
   }
 
   render() {
-    console.log(this.props);
     return (
       <span className="has-text-success block-quote-wrapper">
         <FontAwesomeIcon icon={faGreaterThan} />

@@ -328,8 +328,10 @@ export class Chat extends Component<Props, State> {
       this.setState({
         chatHistory: this.historyManager.getHistory(this.currentChannel),
       });
+      this.imagesLoaded = [];
       this.setState(
         {
+          initialLoad: true,
           scrollLock: true,
         },
         () => {
@@ -982,22 +984,14 @@ export class Chat extends Component<Props, State> {
                       .scrollTop;
                     const vScrollPosition =
                       scrollHeight - (scrollTop + chatWindowHeight);
-                    console.log({
-                      chatWindowHeight,
-                      scrollTop,
-                      scrollHeight,
-                      vScrollPosition,
-                    });
 
                     if (vScrollPosition === 0) {
-                      console.log('enabling scroll lock');
                       this.setState({
                         scrollLock: true,
                       });
                     }
 
                     if (vScrollPosition > 0) {
-                      console.log('disabling scroll lock');
                       this.setState({
                         scrollLock: false,
                       });
