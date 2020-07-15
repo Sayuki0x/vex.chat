@@ -7059,10 +7059,10 @@ levn@^0.3.0, levn@~0.3.0:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
 
-libvex@^2.4.5:
-  version "2.4.5"
-  resolved "https://registry.yarnpkg.com/libvex/-/libvex-2.4.5.tgz#82212d8115a9a8a235f186f21b1f4995f541ec8e"
-  integrity sha512-/2QhN/GdeNXpxicZ+iLYxbGa9XIWcbSrEU9cZcoIkDjwcC4t49bWS/CHiur9YgwpCdAor9mJqIQR/LeIF3wvaQ==
+libvex@^2.4.9:
+  version "2.4.9"
+  resolved "https://registry.yarnpkg.com/libvex/-/libvex-2.4.9.tgz#20f40572eeddec05d67077a3b7543e1f44107832"
+  integrity sha512-Kt3DF2iG8Hj0E09TEsYET9rUW2Vbmd55o7uUan7pEueoOlrNt4oIhvHQ4YvXVijBpCWz9CkJBHirDBqqKViD/Q==
   dependencies:
     "@types/node" "^14.0.14"
     "@types/uuid" "^8.0.0"
