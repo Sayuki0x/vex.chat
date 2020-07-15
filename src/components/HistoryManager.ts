@@ -5,13 +5,19 @@ import ReactMarkdown, { NodeType } from 'react-markdown';
 import { ChatLink } from './ChatLink';
 import { ChatImage } from './ChatImage';
 import { ChatBlockquote } from './ChatBlockquote';
+import { ChatText } from './ChatText';
 
 function parseMarkdown(message: IChatMessage) {
   const disallowedTypes: NodeType[] = [];
   const options = {
     source: message.message,
     linkTarget: '_blank',
-    renderers: { link: ChatLink, image: ChatImage, blockquote: ChatBlockquote },
+    renderers: {
+      link: ChatLink,
+      image: ChatImage,
+      blockquote: ChatBlockquote,
+      text: ChatText,
+    },
     disallowedTypes,
   };
   return new ReactMarkdown(options);

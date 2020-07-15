@@ -23,6 +23,9 @@ import { getUserIcon, userProfile, getAvatar } from './userProfile';
 import { MultiSelect } from './Select';
 import { HistoryManager } from './HistoryManager';
 import { isImageType } from '../constants/mimeTypes';
+import { EventEmitter } from 'events';
+
+export const imageLoadMonitor = new EventEmitter();
 
 const uniqueArray = (arr: any[]) => {
   return arr.filter((thing: any, index: number) => {
@@ -78,6 +81,8 @@ type State = {
   rightBarOpen: boolean;
   leftBarClosing: boolean;
   rightBarClosing: boolean;
+  scrollLock: boolean;
+  initialLoad: boolean;
 };
 
 type Props = {
@@ -88,6 +93,7 @@ export class Chat extends Component<Props, State> {
   messagesEnd: any = React.createRef();
   historyManager = new HistoryManager();
   currentChannel = '';
+  imagesLoaded: HTMLSpanElement[];
 
   constructor(props: Props) {
     super(props);
@@ -100,6 +106,7 @@ export class Chat extends Component<Props, State> {
       leftBarAnimation: '',
       rightBarAnimation: '',
       modalIsActive: false,
+      scrollLock: true,
       modalContents: <span />,
       joinedRooms: [],
       redirect: null,
@@ -110,8 +117,9 @@ export class Chat extends Component<Props, State> {
       rightBarOpen: window.innerWidth > desktop,
       rightBarClosing: false,
       leftBarClosing: false,
+      initialLoad: true,
     };
-
+    this.imagesLoaded = [];
     this.scrollToBottom = this.scrollToBottom.bind(this);
     this.changeNickname = this.changeNickname.bind(this);
     this.openModal = this.openModal.bind(this);
@@ -220,6 +228,25 @@ export class Chat extends Component<Props, State> {
       });
     }
 
+    imageLoadMonitor.on('imageLoad', (ref) => {
+      this.imagesLoaded.push(ref);
+      if (!this.state.initialLoad) {
+        return;
+      }
+
+      if (
+        document
+          .getElementById('chat-window')
+          ?.getElementsByClassName('chat-image-wrapper').length ===
+        this.imagesLoaded.length
+      ) {
+        this.scrollToBottom();
+        this.setState({
+          initialLoad: false,
+        });
+      }
+    });
+
     if (this.props.match.params.id) {
       this.currentChannel = this.props.match.params.id;
       localStorage.setItem('currentChannel', this.props.match.params.id);
@@ -295,14 +322,25 @@ export class Chat extends Component<Props, State> {
     window.removeEventListener('resize', this.updateWindowDimensions);
   }
 
-  componentDidUpdate() {
+  async componentDidUpdate() {
     if (this.currentChannel !== this.props.match.params.id) {
       this.currentChannel = this.props.match.params.id;
       this.setState({
         chatHistory: this.historyManager.getHistory(this.currentChannel),
       });
+      this.setState(
+        {
+          scrollLock: true,
+        },
+        () => {
+          this.scrollToBottom();
+        }
+      );
     }
-    this.scrollToBottom();
+
+    if (this.state.scrollLock) {
+      this.scrollToBottom();
+    }
   }
 
   scrollToBottom = () => {
@@ -929,11 +967,42 @@ export class Chat extends Component<Props, State> {
             <section>
               <div {...getRootProps()}>
                 <div
+                  id="chat-window"
                   className={`${chatWindowSize(
                     this.state.leftBarOpen,
                     this.state.rightBarOpen,
                     this.state.viewportWidth
                   )} chat-window has-background-black-ter`}
+                  onScroll={(event) => {
+                    const chatWindowHeight = (event.target as HTMLInputElement)
+                      .offsetHeight;
+                    const scrollHeight = (event.target as HTMLInputElement)
+                      .scrollHeight;
+                    const scrollTop = (event.target as HTMLInputElement)
+                      .scrollTop;
+                    const vScrollPosition =
+                      scrollHeight - (scrollTop + chatWindowHeight);
+                    console.log({
+                      chatWindowHeight,
+                      scrollTop,
+                      scrollHeight,
+                      vScrollPosition,
+                    });
+
+                    if (vScrollPosition === 0) {
+                      console.log('enabling scroll lock');
+                      this.setState({
+                        scrollLock: true,
+                      });
+                    }
+
+                    if (vScrollPosition > 0) {
+                      console.log('disabling scroll lock');
+                      this.setState({
+                        scrollLock: false,
+                      });
+                    }
+                  }}
                 >
                   <div className="chat-message-wrapper">
                     {this.state.chatHistory.map((messages) => {

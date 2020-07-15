@@ -1,4 +1,5 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
+import { imageLoadMonitor } from './Chat';
 
 type State = {
   previewOpen: boolean;
@@ -19,6 +20,7 @@ export class ChatImage extends Component<Props, State> {
   }
 
   render() {
+    let ref: HTMLSpanElement | null = null;
     if (this.props.alt.includes('emoji-')) {
       return (
         <img src={this.props.src} alt={this.props.alt} className="emoji" />
@@ -26,7 +28,7 @@ export class ChatImage extends Component<Props, State> {
     }
 
     return (
-      <Fragment>
+      <span className="chat-image-wrapper" ref={(spanRef) => (ref = spanRef)}>
         <span
           className={`image-preview modal ${
             this.state.previewOpen ? 'is-active' : ''
@@ -66,6 +68,7 @@ export class ChatImage extends Component<Props, State> {
           </span>
         </span>
         <img
+          onLoad={() => imageLoadMonitor.emit('imageLoad', ref)}
           src={this.props.src}
           alt={this.props.alt}
           style={{ maxHeight: '300px' }}
@@ -76,7 +79,7 @@ export class ChatImage extends Component<Props, State> {
           }}
         />
         <br />
-      </Fragment>
+      </span>
     );
   }
 }

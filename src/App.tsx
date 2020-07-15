@@ -17,8 +17,9 @@ export const client = new Client(
 );
 
 client.on('ready', async () => {
+  await client.register();
+
   if (!localStorage.getItem('pk')) {
-    await client.register();
     localStorage.setItem('pk', Utils.toHexString(keyring.getPriv()));
   }
   await client.auth();
