@@ -20,6 +20,34 @@ $menu-item-active-background-color: $black-ter;
 
 @import '../../node_modules/bulma/bulma.sass';
 
+.avatar-upload-button:hover {
+  cursor: pointer;
+  background-color: lighten($grey-darker, 5%);
+}
+
+.avatar-upload-button {
+  position: absolute;
+  background-color: $grey-darker;
+  color: $white;
+  top: 0;
+  right: 0;
+  margin-top: -5px;
+  margin-right: -5px;
+  left: auto;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
 a:hover {
   color: lighten($red, 5%);
 }
