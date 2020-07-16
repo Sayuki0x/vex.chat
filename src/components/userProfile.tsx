@@ -10,7 +10,7 @@ import {
   faPoo,
   faFileUpload,
 } from '@fortawesome/free-solid-svg-icons';
-import { KeyRing, Utils } from 'libvex';
+import { KeyRing, Utils, IUser } from 'libvex';
 import { isImageType } from '../constants/mimeTypes';
 import { emptyUUID } from '../constants/emptyUUID';
 
@@ -23,14 +23,14 @@ const downloadTxtFile = (s: string, filename: string) => {
   element.click();
 };
 
-export const getAvatar = (userID: string, avatarID: string) => {
-  if (avatarID === emptyUUID) {
+export const getAvatar = (user: IUser) => {
+  if (user.avatar === emptyUUID) {
     return (
       <img
         className="is-rounded"
         alt="user avatar"
         style={{
-          backgroundColor: getUserColor(userID),
+          backgroundColor: getUserColor(user.userID),
         }}
         src={defaultAvatar}
       />
@@ -43,7 +43,7 @@ export const getAvatar = (userID: string, avatarID: string) => {
         style={{
           backgroundColor: 'transparent',
         }}
-        src={client.getHost(false) + '/file/' + avatarID}
+        src={client.getHost(false) + '/file/' + user.avatar}
       />
     );
   }
@@ -73,8 +73,8 @@ export const getUserIcon = (powerLevel: number) => {
   return null;
 };
 
-export const userProfile = async (userID: string, avatarID: string) => {
-  const userDetails = await client.users.retrieve(userID);
+export const userProfile = async (user: IUser) => {
+  const userDetails = await client.users.retrieve(user.userID);
   let uploadRef: HTMLInputElement | null = null;
   let avatarUploadRef: HTMLInputElement | null = null;
   let errorRef: HTMLSpanElement | null = null;
@@ -82,11 +82,15 @@ export const userProfile = async (userID: string, avatarID: string) => {
     <article className="media profile-modal has-background-black">
       <figure className="media-left">
         <p className="image is-64x64">
-          {getAvatar(userID, avatarID)}{' '}
+          {getAvatar(user)}{' '}
           <span
             className="avatar-upload-button"
             onClick={() => {
               avatarUploadRef?.click();
+            }}
+            style={{
+              display:
+                user.userID === client.info().client!.userID ? '' : 'none',
             }}
           >
             <FontAwesomeIcon icon={faFileUpload} />
@@ -107,7 +111,7 @@ export const userProfile = async (userID: string, avatarID: string) => {
                 return;
               }
               const reader = new FileReader();
-              console.log(userID);
+              console.log(user.userID);
               reader.onload = async (loadEvent) => {
                 const file = loadEvent.target?.result;
                 if (file) {
@@ -116,10 +120,10 @@ export const userProfile = async (userID: string, avatarID: string) => {
                   const uploadedFileInfo = await client.files.create(
                     Utils.toHexString(view),
                     fileEvent.target.files![0].name,
-                    userID
+                    user.userID
                   );
                   await client.users.update(
-                    userID,
+                    user.userID,
                     undefined,
                     uploadedFileInfo.fileID
                   );

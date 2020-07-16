@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 
 import React, { Component, Fragment } from 'react';
-import { IChannel, IClientInfo, IChatMessage, IUser, Utils } from 'libvex';
+import { IChannel, IChatMessage, IUser, Utils } from 'libvex';
 import { client } from '../App';
 import { Link, Redirect } from 'react-router-dom';
 import { getUserColor, getUserHexTag } from '../utils/getUserColor';
@@ -65,7 +65,7 @@ const desktop = 1024;
 
 type State = {
   channelList: IChannel[];
-  clientInfo: IClientInfo;
+  userInfo: IUser | null;
   onlineLists: Record<string, IUser[]>;
   leftBarAnimation: string;
   rightBarAnimation: string;
@@ -101,7 +101,7 @@ export class Chat extends Component<Props, State> {
     this.state = {
       channelList: [],
       chatHistory: [[]],
-      clientInfo: client.info(),
+      userInfo: null,
       inputValue: '',
       onlineLists: {},
       leftBarAnimation: '',
@@ -276,6 +276,12 @@ export class Chat extends Component<Props, State> {
       });
 
       this.scrollToBottom();
+    });
+
+    client.on('userInfo', (userInfo) => {
+      this.setState({
+        userInfo,
+      });
     });
 
     client.on('channelList', async (channelList) => {
@@ -901,13 +907,10 @@ export class Chat extends Component<Props, State> {
               <div className="Aligner">
                 <div className="Aligner-item Aligner-item--top" />
                 <div className="Aligner-item">
-                  {client.info().client && (
+                  {this.state.userInfo && (
                     <Fragment>
                       <span className="image is-32x32 user-bar-avatar">
-                        {getAvatar(
-                          client.info().client!.userID,
-                          (client.info().client! as any).avatar
-                        )}
+                        {getAvatar(this.state.userInfo)}
                       </span>
                       <span
                         className="user-bar-username"
@@ -924,10 +927,7 @@ export class Chat extends Component<Props, State> {
                         className="user-bar-cog-wrapper"
                         onClick={async () => {
                           this.openModal(
-                            await userProfile(
-                              client.info().client!.userID,
-                              (client.info().client! as any).avatar
-                            )
+                            await userProfile(this.state.userInfo!)
                           );
                           if (this.state.viewportWidth < tablet) {
                             this.closeLeftBar();
@@ -1033,10 +1033,7 @@ export class Chat extends Component<Props, State> {
                         >
                           <figure className="media-left">
                             <p className="image is-48x48">
-                              {getAvatar(
-                                messages[0].userID,
-                                (messages[0] as any).author.avatar
-                              )}
+                              {getAvatar(messages[0].author)}
                             </p>
                           </figure>
                           <div className="media-content">
@@ -1048,6 +1045,11 @@ export class Chat extends Component<Props, State> {
                                   className="message-username has-text-weight-bold"
                                   style={{
                                     color: getUserColor(messages[0].userID),
+                                  }}
+                                  onClick={async () => {
+                                    this.openModal(
+                                      await userProfile(messages[0].author)
+                                    );
                                   }}
                                 >
                                   {messages[0].username}
@@ -1173,10 +1175,7 @@ export class Chat extends Component<Props, State> {
                                   data={messages[0]}
                                   onClick={async (e: any, data: any) => {
                                     this.openModal(
-                                      await userProfile(
-                                        messages[0].userID,
-                                        (messages[0] as any).author.avatar
-                                      )
+                                      await userProfile(messages[0].author)
                                     );
                                   }}
                                 >
@@ -1359,9 +1358,7 @@ export class Chat extends Component<Props, State> {
                           <MenuItem
                             data={user}
                             onClick={async (e: any, data: any) => {
-                              this.openModal(
-                                await userProfile(user.userID, user.avatar)
-                              );
+                              this.openModal(await userProfile(user));
                             }}
                           >
                             Add To Channel
@@ -1407,9 +1404,7 @@ export class Chat extends Component<Props, State> {
                           <MenuItem
                             data={user}
                             onClick={async (e: any, data: any) => {
-                              this.openModal(
-                                await userProfile(user.userID, user.avatar)
-                              );
+                              this.openModal(await userProfile(user));
                             }}
                           >
                             View Profile
