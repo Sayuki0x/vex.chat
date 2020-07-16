@@ -932,7 +932,13 @@ export class Chat extends Component<Props, State> {
                           color: (this.state.userInfo as any).color,
                         }}
                       >
-                        {client.info().client!.username}
+                        <strong
+                          style={{
+                            color: (this.state.userInfo as any).color,
+                          }}
+                        >
+                          {client.info().client!.username}<span className="translucent">#{getUserHexTag(client.info().client!.userID)}</span>
+                        </strong>
                         <span className="translucent">
                           {/* "#" + getUserHexTag(client.info().client!.userID) */}
                         </span>
