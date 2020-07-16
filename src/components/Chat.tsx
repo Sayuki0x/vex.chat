@@ -991,7 +991,7 @@ export class Chat extends Component<Props, State> {
                     const vScrollPosition =
                       scrollHeight - (scrollTop + chatWindowHeight);
 
-                    if (vScrollPosition < 0) {
+                    if (vScrollPosition === 0) {
                       this.setState({
                         scrollLock: true,
                       });
@@ -1206,7 +1206,14 @@ export class Chat extends Component<Props, State> {
             this.state.viewportWidth
           )} bottom-bar has-background-black-ter`}
         >
-          <div className="chat-input-wrapper has-background-grey-darker">
+          <div
+            className="chat-input-wrapper has-background-grey-darker"
+            onFocus={() => {
+              if (this.state.scrollLock) {
+                this.scrollToBottom();
+              }
+            }}
+          >
             <input
               type="file"
               style={{ display: 'none' }}
