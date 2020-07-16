@@ -18,6 +18,7 @@ import {
   faBars,
   faUsers,
   faPaperclip,
+  faArrowCircleDown,
 } from '@fortawesome/free-solid-svg-icons';
 import { getUserIcon, userProfile, getAvatar } from './userProfile';
 import { MultiSelect } from './Select';
@@ -1004,6 +1005,17 @@ export class Chat extends Component<Props, State> {
                     }
                   }}
                 >
+                  {!this.state.scrollLock && (
+                  <div className="chat-window-snap-to-bottom">
+                  <FontAwesomeIcon icon={faArrowCircleDown} onClick={() => {
+                    this.setState({
+                      scrollLock: true,
+                    }, () => {                     this.scrollToBottom();
+                     })
+                  }} />
+                </div>
+                  )}
+
                   <div className="chat-message-wrapper">
                     {this.state.chatHistory.map((messages) => {
                       if (messages.length === 0) return null;

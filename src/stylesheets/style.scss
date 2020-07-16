@@ -443,6 +443,20 @@ input {
   left: 0;
 }
 
+.chat-window-snap-to-bottom {
+  position: absolute;
+  bottom: 0rem;
+  right: 1.25rem;
+  z-index: 5;
+  font-size: 28px;
+  color: $grey-darker;
+  opacity: 0.5;
+}
+
+.chat-window-snap-to-bottom:hover {
+  opacity: 1;
+}
+
 .chat-message-wrapper {
   display: flex;
   flex-direction: column;
