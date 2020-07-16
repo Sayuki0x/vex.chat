@@ -470,6 +470,10 @@ input {
   padding-right: 20px;
 }
 
+.chat-message-wrapper:last-child {
+  padding-top: 20px;
+}
+
 .chat-messages {
   flex: 1;
   height: 100%;

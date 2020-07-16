@@ -62,6 +62,7 @@ export class HistoryManager extends EventEmitter {
       this.chatHistory[channelID][this.chatHistory[channelID].length - 1].push(
         message
       );
+      return;
     }
     if (
       this.chatHistory[channelID][this.chatHistory[channelID].length - 1][
@@ -76,6 +77,7 @@ export class HistoryManager extends EventEmitter {
       this.chatHistory[channelID][this.chatHistory[channelID].length - 1].push(
         message
       );
+      return;
     } else {
       this.chatHistory[channelID].push([message]);
     }
