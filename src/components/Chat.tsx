@@ -1006,14 +1006,21 @@ export class Chat extends Component<Props, State> {
                   }}
                 >
                   {!this.state.scrollLock && (
-                  <div className="chat-window-snap-to-bottom">
-                  <FontAwesomeIcon icon={faArrowCircleDown} onClick={() => {
-                    this.setState({
-                      scrollLock: true,
-                    }, () => {                     this.scrollToBottom();
-                     })
-                  }} />
-                </div>
+                    <div className="chat-window-snap-to-bottom">
+                      <FontAwesomeIcon
+                        icon={faArrowCircleDown}
+                        onClick={() => {
+                          this.setState(
+                            {
+                              scrollLock: true,
+                            },
+                            () => {
+                              this.scrollToBottom();
+                            }
+                          );
+                        }}
+                      />
+                    </div>
                   )}
 
                   <div className="chat-message-wrapper">

@@ -448,13 +448,12 @@ input {
   bottom: 0rem;
   right: 1.25rem;
   z-index: 5;
-  font-size: 28px;
+  font-size: 42px;
   color: $grey-darker;
-  opacity: 0.5;
 }
 
 .chat-window-snap-to-bottom:hover {
-  opacity: 1;
+  color: lighten($grey-darker, 5%);
 }
 
 .chat-message-wrapper {
