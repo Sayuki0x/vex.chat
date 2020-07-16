@@ -22,13 +22,14 @@ $menu-item-active-background-color: $black-ter;
 
 .avatar-upload-button:hover {
   cursor: pointer;
-  background-color: lighten($grey-darker, 5%);
+  background-color: darken($grey-darker, 10%);
+  color: $white;
 }
 
 .avatar-upload-button {
   position: absolute;
-  background-color: $grey-darker;
   color: $white;
+  background-color: $grey-darker;
   top: 0;
   right: 0;
   margin-top: -5px;
@@ -396,6 +397,15 @@ input {
 
 .role-icon {
   padding-right: 1ch;
+}
+
+.color-picker-wrapper {
+  color: $grey-darker;
+}
+
+.color-picker-wrapper:hover {
+  cursor: pointer;
+  color: darken($grey-darker, 10%) !important;
 }
 
 .message-username {

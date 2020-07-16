@@ -4,7 +4,7 @@ import React, { Component, Fragment } from 'react';
 import { IChannel, IChatMessage, IUser, Utils } from 'libvex';
 import { client } from '../App';
 import { Link, Redirect } from 'react-router-dom';
-import { getUserColor, getUserHexTag } from '../utils/getUserColor';
+import { getUserHexTag } from '../utils/getUserHexTag';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 import { Swipeable } from 'react-swipeable';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -433,7 +433,9 @@ export class Chat extends Component<Props, State> {
   openModal(el: JSX.Element) {
     this.setState({
       modalIsActive: true,
-      modalContents: el,
+      modalContents: (
+        <div className="modal-wrapper slide-in-bck-center">{el}</div>
+      ),
     });
   }
 
@@ -808,7 +810,7 @@ export class Chat extends Component<Props, State> {
                                         <span
                                           className="message-username has-text-weight-bold"
                                           style={{
-                                            color: getUserColor(user.userID),
+                                            color: (user as any).color,
                                           }}
                                         >
                                           {user.username}
@@ -927,7 +929,7 @@ export class Chat extends Component<Props, State> {
                       <span
                         className="user-bar-username"
                         style={{
-                          color: getUserColor(client.info().client!.userID),
+                          color: (this.state.userInfo as any).color,
                         }}
                       >
                         {client.info().client!.username}
@@ -941,7 +943,8 @@ export class Chat extends Component<Props, State> {
                           this.openModal(
                             await userProfile(
                               this.state.userInfo!,
-                              this.closeModal
+                              this.closeModal,
+                              this.openModal
                             )
                           );
                           if (this.state.viewportWidth < tablet) {
@@ -1059,13 +1062,14 @@ export class Chat extends Component<Props, State> {
                                 <span
                                   className="message-username has-text-weight-bold"
                                   style={{
-                                    color: getUserColor(messages[0].userID),
+                                    color: (messages[0].author as any).color,
                                   }}
                                   onClick={async () => {
                                     this.openModal(
                                       await userProfile(
                                         messages[0].author,
-                                        this.closeModal
+                                        this.closeModal,
+                                        this.openModal
                                       )
                                     );
                                   }}
@@ -1195,7 +1199,8 @@ export class Chat extends Component<Props, State> {
                                     this.openModal(
                                       await userProfile(
                                         messages[0].author,
-                                        this.closeModal
+                                        this.closeModal,
+                                        this.openModal
                                       )
                                     );
                                   }}
@@ -1357,7 +1362,7 @@ export class Chat extends Component<Props, State> {
                               <span
                                 className="message-username has-text-weight-bold"
                                 style={{
-                                  color: getUserColor(user.userID),
+                                  color: (user as any).color,
                                 }}
                               >
                                 {user.username}
@@ -1380,7 +1385,11 @@ export class Chat extends Component<Props, State> {
                             data={user}
                             onClick={async (e: any, data: any) => {
                               this.openModal(
-                                await userProfile(user, this.closeModal)
+                                await userProfile(
+                                  user,
+                                  this.closeModal,
+                                  this.openModal
+                                )
                               );
                             }}
                           >
@@ -1428,7 +1437,11 @@ export class Chat extends Component<Props, State> {
                             data={user}
                             onClick={async (e: any, data: any) => {
                               this.openModal(
-                                await userProfile(user, this.closeModal)
+                                await userProfile(
+                                  user,
+                                  this.closeModal,
+                                  this.openModal
+                                )
                               );
                             }}
                           >

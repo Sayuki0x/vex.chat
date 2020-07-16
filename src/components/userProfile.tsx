@@ -3,12 +3,13 @@
 import React from 'react';
 import { client } from '../App';
 import defaultAvatar from '../images/default_avatar.svg';
-import { getUserColor, getUserHexTag } from '../utils/getUserColor';
+import { getUserHexTag } from '../utils/getUserHexTag';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCrown,
   faPoo,
   faFileUpload,
+  faPaintBrush,
 } from '@fortawesome/free-solid-svg-icons';
 import { KeyRing, Utils, IUser } from 'libvex';
 import { isImageType } from '../constants/mimeTypes';
@@ -30,7 +31,7 @@ export const getAvatar = (user: IUser) => {
         className="is-rounded"
         alt="user avatar"
         style={{
-          backgroundColor: getUserColor(user.userID),
+          backgroundColor: (user as any).color,
         }}
         src={defaultAvatar}
       />
@@ -73,7 +74,11 @@ export const getUserIcon = (powerLevel: number) => {
   return null;
 };
 
-export const userProfile = async (user: IUser, closeModal: () => void) => {
+export const userProfile = async (
+  user: IUser,
+  closeModal: () => void,
+  openModal: (el: JSX.Element) => void
+) => {
   const userDetails = await client.users.retrieve(user.userID);
   let uploadRef: HTMLInputElement | null = null;
   let avatarUploadRef: HTMLInputElement | null = null;
@@ -122,11 +127,10 @@ export const userProfile = async (user: IUser, closeModal: () => void) => {
                     fileEvent.target.files![0].name,
                     user.userID
                   );
-                  await client.users.update(
-                    user.userID,
-                    undefined,
-                    uploadedFileInfo.fileID
-                  );
+                  await client.users.update({
+                    userID: user.userID,
+                    avatar: uploadedFileInfo.fileID,
+                  });
 
                   closeModal();
                 }
@@ -143,12 +147,56 @@ export const userProfile = async (user: IUser, closeModal: () => void) => {
         <div className="content">
           <p
             className="has-text-weight-bold is-size-3"
-            style={{ color: getUserColor(userDetails.userID) }}
+            style={{ color: (user as any).color }}
           >
             {userDetails.username}
             <span className="translucent">
               #{getUserHexTag(userDetails.userID)}
             </span>
+            &nbsp;&nbsp;
+            {user.userID === client.info().client!.userID && (
+              <span
+                className="color-picker-wrapper"
+                onClick={() => {
+                  let inputRef: any = React.createRef();
+                  const nicknameChanger = (
+                    <form
+                      onSubmit={async (event) => {
+                        event.preventDefault();
+                        if (inputRef.value === '') {
+                          return;
+                        }
+                        closeModal();
+                        await client.users.update({
+                          userID: user.userID,
+                          color: inputRef.value,
+                        } as any);
+                        // nick function here
+                      }}
+                    >
+                      <p className="has-text-white">CHANGE COLOR</p>
+                      <br />
+                      <input
+                        autoFocus
+                        ref={(ref) => (inputRef = ref)}
+                        placeholder={
+                          'Enter a valid CSS color (e.g. #DEADED)...'
+                        }
+                        className={`input`}
+                      ></input>
+                      <div className="modal-bottom-strip has-text-right">
+                        <button className="button is-black" type="submit">
+                          Save
+                        </button>
+                      </div>
+                    </form>
+                  );
+                  openModal(nicknameChanger);
+                }}
+              >
+                {<FontAwesomeIcon icon={faPaintBrush} />}
+              </span>
+            )}
             &nbsp;&nbsp;
             {getUserIcon(userDetails.powerLevel)}
           </p>
