@@ -991,13 +991,13 @@ export class Chat extends Component<Props, State> {
                     const vScrollPosition =
                       scrollHeight - (scrollTop + chatWindowHeight);
 
-                    if (vScrollPosition === 0) {
+                    if (vScrollPosition < 0) {
                       this.setState({
                         scrollLock: true,
                       });
                     }
 
-                    if (vScrollPosition > 0) {
+                    if (vScrollPosition > 150) {
                       this.setState({
                         scrollLock: false,
                       });
