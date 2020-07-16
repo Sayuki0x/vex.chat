@@ -284,6 +284,12 @@ export class Chat extends Component<Props, State> {
       });
     });
 
+    client.on('peerChange', (peerInfo) => {
+      console.log('reached');
+      console.log(this.state.channelList);
+      this.historyManager.fetchHistory(this.state.channelList);
+    });
+
     client.on('channelList', async (channelList) => {
       this.setState({
         channelList,
@@ -311,6 +317,12 @@ export class Chat extends Component<Props, State> {
 
       this.setState({
         onlineLists,
+      });
+    });
+
+    this.historyManager.on('reloadAll', () => {
+      this.setState({
+        chatHistory: this.historyManager.getHistory(this.props.match.params.id),
       });
     });
 
@@ -927,7 +939,10 @@ export class Chat extends Component<Props, State> {
                         className="user-bar-cog-wrapper"
                         onClick={async () => {
                           this.openModal(
-                            await userProfile(this.state.userInfo!)
+                            await userProfile(
+                              this.state.userInfo!,
+                              this.closeModal
+                            )
                           );
                           if (this.state.viewportWidth < tablet) {
                             this.closeLeftBar();
@@ -1048,7 +1063,10 @@ export class Chat extends Component<Props, State> {
                                   }}
                                   onClick={async () => {
                                     this.openModal(
-                                      await userProfile(messages[0].author)
+                                      await userProfile(
+                                        messages[0].author,
+                                        this.closeModal
+                                      )
                                     );
                                   }}
                                 >
@@ -1175,7 +1193,10 @@ export class Chat extends Component<Props, State> {
                                   data={messages[0]}
                                   onClick={async (e: any, data: any) => {
                                     this.openModal(
-                                      await userProfile(messages[0].author)
+                                      await userProfile(
+                                        messages[0].author,
+                                        this.closeModal
+                                      )
                                     );
                                   }}
                                 >
@@ -1358,7 +1379,9 @@ export class Chat extends Component<Props, State> {
                           <MenuItem
                             data={user}
                             onClick={async (e: any, data: any) => {
-                              this.openModal(await userProfile(user));
+                              this.openModal(
+                                await userProfile(user, this.closeModal)
+                              );
                             }}
                           >
                             Add To Channel
@@ -1404,7 +1427,9 @@ export class Chat extends Component<Props, State> {
                           <MenuItem
                             data={user}
                             onClick={async (e: any, data: any) => {
-                              this.openModal(await userProfile(user));
+                              this.openModal(
+                                await userProfile(user, this.closeModal)
+                              );
                             }}
                           >
                             View Profile

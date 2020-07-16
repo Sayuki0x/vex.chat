@@ -73,7 +73,7 @@ export const getUserIcon = (powerLevel: number) => {
   return null;
 };
 
-export const userProfile = async (user: IUser) => {
+export const userProfile = async (user: IUser, closeModal: () => void) => {
   const userDetails = await client.users.retrieve(user.userID);
   let uploadRef: HTMLInputElement | null = null;
   let avatarUploadRef: HTMLInputElement | null = null;
@@ -127,6 +127,8 @@ export const userProfile = async (user: IUser) => {
                     undefined,
                     uploadedFileInfo.fileID
                   );
+
+                  closeModal();
                 }
               };
               reader.onerror = (error) => {
