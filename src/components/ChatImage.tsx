@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { imageLoadMonitor } from './Chat';
+import { imageLoadMonitor } from '../views/Chat';
 
 type State = {
   previewOpen: boolean;

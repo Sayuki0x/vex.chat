@@ -612,6 +612,10 @@ input {
   font-weight: bold;
 }
 
+.chat-window-messages {
+  display: inline-block;
+}
+
 .channel-finder__multi-value__remove:hover {
   color: $white !important;
   background-color: $red !important;
