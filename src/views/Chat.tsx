@@ -15,6 +15,7 @@ import { ChatWindow } from '../components/ChatWindow';
 import { desktop, tablet } from '../constants/responsiveness';
 import { chatWindowSize } from '../utils/chatWindowSize';
 import { OnlineUserbar } from '../components/OnlineUserbar';
+import { Userbar } from '../components/Userbar';
 
 export const imageLoadMonitor = new EventEmitter();
 
@@ -572,6 +573,14 @@ export class Chat extends Component<Props, State> {
               channelList={this.state.channelList}
               match={this.props.match}
             />
+
+            <Userbar
+              userInfo={this.state.userInfo}
+              openModal={this.openModal}
+              closeModal={this.closeModal}
+              closeLeftBar={this.closeLeftBar}
+              viewportWidth={this.state.viewportWidth}
+            />
           </div>
         </Swipeable>
         <div className="chat-window-wrapper">
@@ -615,7 +624,13 @@ export class Chat extends Component<Props, State> {
               this.state.rightBarOpen ? '' : 'hidden'
             }`}
           >
-            <OnlineUserbar onlineLists={this.state.onlineLists} changeNickname={this.changeNickname} openModal={this.openModal} closeModal={this.closeModal} match={this.props.match} />
+            <OnlineUserbar
+              onlineLists={this.state.onlineLists}
+              changeNickname={this.changeNickname}
+              openModal={this.openModal}
+              closeModal={this.closeModal}
+              match={this.props.match}
+            />
           </div>
         </Swipeable>
       </div>
