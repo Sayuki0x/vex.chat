@@ -5,7 +5,7 @@ import { IChannel, IChatMessage, IUser, Utils } from 'libvex';
 import { client } from '../App';
 import { Redirect } from 'react-router-dom';
 import { Swipeable } from 'react-swipeable';
-import { HistoryManager } from '../components/HistoryManager';
+import { HistoryManager } from '../utils/HistoryManager';
 import { isImageType } from '../constants/mimeTypes';
 import { EventEmitter } from 'events';
 import { ChatInput } from '../components/ChatInput';

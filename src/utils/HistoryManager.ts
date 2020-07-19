@@ -2,10 +2,10 @@ import { IChatMessage, IChannel } from 'libvex';
 import { client } from '../App';
 import { EventEmitter } from 'events';
 import ReactMarkdown, { NodeType } from 'react-markdown';
-import { ChatLink } from './ChatLink';
-import { ChatImage } from './ChatImage';
-import { ChatBlockquote } from './ChatBlockquote';
-import { ChatText } from './ChatText';
+import { ChatLink } from '../components/renderers/Link';
+import { ChatImage } from '../components/renderers/Image';
+import { ChatBlockquote } from '../components/renderers/Blockquote';
+import { ChatText } from '../components/renderers/Text';
 
 function parseMarkdown(message: IChatMessage) {
   const disallowedTypes: NodeType[] = [];
