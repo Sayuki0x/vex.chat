@@ -364,7 +364,7 @@ export class Chat extends Component<Props, State> {
     return chunked;
   };
 
-  changeNickname(e: any, data: any) {
+  changeNickname() {
     let inputRef: any = React.createRef();
     const nicknameChanger = (
       <form
@@ -580,6 +580,7 @@ export class Chat extends Component<Props, State> {
               closeModal={this.closeModal}
               closeLeftBar={this.closeLeftBar}
               viewportWidth={this.state.viewportWidth}
+              changeNickname={this.changeNickname}
             />
           </div>
         </Swipeable>

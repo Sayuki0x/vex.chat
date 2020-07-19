@@ -77,7 +77,8 @@ export const getUserIcon = (powerLevel: number) => {
 export const userProfile = async (
   user: IUser,
   closeModal: () => void,
-  openModal: (el: JSX.Element) => void
+  openModal: (el: JSX.Element) => void,
+  changeNickname: () => void
 ) => {
   const userDetails = await client.users.retrieve(user.userID);
   let uploadRef: HTMLInputElement | null = null;
@@ -146,8 +147,11 @@ export const userProfile = async (
       <div className="media-content">
         <div className="content">
           <p
-            className="has-text-weight-bold is-size-3"
+            className="has-text-weight-bold is-size-3 profile-username"
             style={{ color: (user as any).color }}
+            onClick={() => {
+              changeNickname();
+            }}
           >
             {userDetails.username}
             <span className="translucent">

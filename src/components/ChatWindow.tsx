@@ -21,7 +21,7 @@ type Props = {
   openModal: (el: JSX.Element) => void;
   closeModal: () => void;
   scrollToBottom: () => void;
-  changeNickname: (e: any, data: any) => void;
+  changeNickname: () => void;
   setScrollLock: (state: boolean) => void;
 };
 
@@ -135,7 +135,8 @@ export class ChatWindow extends Component<Props, State> {
                                     await userProfile(
                                       messages[0].author,
                                       this.props.closeModal,
-                                      this.props.openModal
+                                      this.props.openModal,
+                                      this.props.changeNickname
                                     )
                                   );
                                 }}
@@ -263,7 +264,8 @@ export class ChatWindow extends Component<Props, State> {
                                     await userProfile(
                                       messages[0].author,
                                       this.props.closeModal,
-                                      this.props.openModal
+                                      this.props.openModal,
+                                      this.props.changeNickname
                                     )
                                   );
                                 }}

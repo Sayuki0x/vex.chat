@@ -13,6 +13,7 @@ type Props = {
   closeModal: () => void;
   closeLeftBar: () => void;
   viewportWidth: number;
+  changeNickname: () => void;
 };
 
 type State = {};
@@ -63,7 +64,8 @@ export class Userbar extends Component<Props, State> {
                       await userProfile(
                         this.props.userInfo!,
                         this.props.closeModal,
-                        this.props.openModal
+                        this.props.openModal,
+                        this.props.changeNickname
                       )
                     );
                     if (this.props.viewportWidth < tablet) {

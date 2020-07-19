@@ -621,6 +621,10 @@ input {
   background-color: $red !important;
 }
 
+.profile-username {
+  cursor: pointer;
+}
+
 .user-bar-username {
   padding-left: 1ch;
 }

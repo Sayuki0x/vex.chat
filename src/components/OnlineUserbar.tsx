@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { Component } from 'react';
 import { IUser } from 'libvex';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
@@ -9,7 +10,7 @@ import { client } from '../App';
 type Props = {
   onlineLists: Record<string, IUser[]>;
   match: any;
-  changeNickname: (e: any, data: any) => void;
+  changeNickname: () => void;
   openModal: (el: JSX.Element) => void;
   closeModal: () => void;
 };
@@ -33,7 +34,19 @@ export class OnlineUserbar extends Component<Props, State> {
             uniqueArray(this.props.onlineLists[this.props.match.params.id]).map(
               (user) => {
                 return (
-                  <div key={'online-user-' + user.userID}>
+                  <div
+                    key={'online-user-' + user.userID}
+                    onClick={async () => {
+                      this.props.openModal(
+                        await userProfile(
+                          user,
+                          this.props.closeModal,
+                          this.props.openModal,
+                          this.props.changeNickname
+                        )
+                      );
+                    }}
+                  >
                     <ContextMenuTrigger
                       id={'online-user-trigger-' + user.userID}
                     >
@@ -72,7 +85,8 @@ export class OnlineUserbar extends Component<Props, State> {
                             await userProfile(
                               user,
                               this.props.closeModal,
-                              this.props.openModal
+                              this.props.openModal,
+                              this.props.changeNickname
                             )
                           );
                         }}
@@ -117,12 +131,13 @@ export class OnlineUserbar extends Component<Props, State> {
                       <MenuItem divider />
                       <MenuItem
                         data={user}
-                        onClick={async (e: any, data: any) => {
+                        onClick={async () => {
                           this.props.openModal(
                             await userProfile(
                               user,
                               this.props.closeModal,
-                              this.props.openModal
+                              this.props.openModal,
+                              this.props.changeNickname
                             )
                           );
                         }}
