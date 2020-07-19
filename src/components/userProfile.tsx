@@ -150,7 +150,8 @@ export const userProfile = async (
             className="has-text-weight-bold is-size-3 profile-username"
             style={{ color: (user as any).color }}
             onClick={() => {
-              changeNickname();
+              if (user.userID === client.info().client!.userID)
+                changeNickname();
             }}
           >
             {userDetails.username}
