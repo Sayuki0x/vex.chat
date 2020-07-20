@@ -149,14 +149,17 @@ export const userProfile = async (
           <p
             className="has-text-weight-bold is-size-3 profile-username"
             style={{ color: (user as any).color }}
-            onClick={() => {
-              if (user.userID === client.info().client!.userID)
-                changeNickname();
-            }}
           >
-            {userDetails.username}
-            <span className="translucent">
-              #{getUserHexTag(userDetails.userID)}
+            <span
+              onClick={() => {
+                if (user.userID === client.info().client!.userID)
+                  changeNickname();
+              }}
+            >
+              {userDetails.username}
+              <span className="translucent">
+                #{getUserHexTag(userDetails.userID)}
+              </span>
             </span>
             &nbsp;&nbsp;
             {user.userID === client.info().client!.userID && (
