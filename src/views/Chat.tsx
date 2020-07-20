@@ -40,6 +40,7 @@ type State = {
   rightBarClosing: boolean;
   scrollLock: boolean;
   initialLoad: boolean;
+  unreadMessageCounts: Record<string, number>;
 };
 
 type Props = {
@@ -75,6 +76,7 @@ export class Chat extends Component<Props, State> {
       rightBarClosing: false,
       leftBarClosing: false,
       initialLoad: true,
+      unreadMessageCounts: {},
     };
     this.imagesLoaded = [];
     this.scrollToBottom = this.scrollToBottom.bind(this);
@@ -226,8 +228,12 @@ export class Chat extends Component<Props, State> {
 
       for (const channel of channelList) {
         await client.channels.join(channel.channelID);
-        const { joinedRooms } = this.state;
+
+        const { joinedRooms, unreadMessageCounts } = this.state;
         joinedRooms.push(channel.channelID);
+
+        unreadMessageCounts[channel.channelID] = 0;
+
         this.setState({
           joinedRooms,
         });
@@ -295,6 +301,10 @@ export class Chat extends Component<Props, State> {
             this.props.match.params.id
           ),
         });
+      } else {
+        const { unreadMessageCounts } = this.state;
+        unreadMessageCounts[message.channelID] += 1;
+        this.setState({ unreadMessageCounts });
       }
     });
   }
@@ -305,13 +315,16 @@ export class Chat extends Component<Props, State> {
 
   async componentDidUpdate() {
     if (this.currentChannel !== this.props.match.params.id) {
+      const { unreadMessageCounts } = this.state;
+      unreadMessageCounts[this.props.match.params.id] = 0;
+
       this.currentChannel = this.props.match.params.id;
-      this.setState({
-        chatHistory: this.historyManager.getHistory(this.currentChannel),
-      });
       this.imagesLoaded = [];
+
       this.setState(
         {
+          chatHistory: this.historyManager.getHistory(this.currentChannel),
+          unreadMessageCounts,
           initialLoad: true,
           scrollLock: true,
         },
@@ -572,6 +585,7 @@ export class Chat extends Component<Props, State> {
               openModal={this.openModal}
               channelList={this.state.channelList}
               match={this.props.match}
+              unreadMessageCounts={this.state.unreadMessageCounts}
             />
 
             <Userbar

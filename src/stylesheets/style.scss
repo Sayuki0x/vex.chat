@@ -26,6 +26,15 @@ $menu-item-active-background-color: $black-ter;
   color: $white;
 }
 
+.unread-icon {
+  border-radius: 60px;
+  background-color: $red;
+  padding: 0.5em 0.8em;
+  float: right;
+  color: $white;
+  font-size: 10px;
+}
+
 .avatar-upload-button {
   position: absolute;
   color: $white;

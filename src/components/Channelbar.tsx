@@ -18,6 +18,7 @@ type Props = {
   openModal: (el: JSX.Element) => void;
   channelList: IChannel[];
   match: any;
+  unreadMessageCounts: Record<string, number>;
 };
 
 type State = {};
@@ -112,6 +113,11 @@ export class Channelbar extends Component<Props, State> {
                       icon={channel.public ? faHashtag : faKey}
                     />
                     &nbsp;&nbsp;<strong>{channel.name}</strong>
+                    {this.props.unreadMessageCounts[channel.channelID] > 0 && (
+                      <span className="unread-icon is-family-monospace has-text-weight-bold">
+                        {this.props.unreadMessageCounts[channel.channelID]}
+                      </span>
+                    )}
                   </Link>
                 </li>
               </ContextMenuTrigger>
