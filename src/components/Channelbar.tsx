@@ -131,10 +131,11 @@ export class Channelbar extends Component<Props, State> {
                       const userArray = [];
 
                       for (const perm of permissionList) {
-                        const user = await client.users.retrieve(perm.userID);
+                        const user = client.users.retrieve(perm.userID);
                         userArray.push(user);
                       }
 
+                      const resolvedPromises = await Promise.all(userArray);
                       let selectedUser = '';
 
                       const channelPermsEditor = (
@@ -144,7 +145,7 @@ export class Channelbar extends Component<Props, State> {
                           </p>
                           <br />
                           <ul>
-                            {userArray.map((user) => {
+                            {resolvedPromises.map((user) => {
                               let spanRef: HTMLSpanElement | null = null;
                               let liRef: HTMLLIElement | null = null;
                               return (
