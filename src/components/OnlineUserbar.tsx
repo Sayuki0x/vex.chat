@@ -69,7 +69,7 @@ export class OnlineUserbar extends Component<Props, State> {
                       </a>
                     </ContextMenuTrigger>
                     <ContextMenu id={'online-user-trigger-' + user.userID}>
-                      {user.userID === client.info().client?.userID && (
+                      {user.userID === client.user?.userID && (
                         <MenuItem
                           data={user}
                           onClick={this.props.changeNickname}
@@ -93,9 +93,8 @@ export class OnlineUserbar extends Component<Props, State> {
                       >
                         Add To Channel
                       </MenuItem>
-                      {client.info().client &&
-                        client.info().client!.powerLevel >
-                          client.info().powerLevels.create && (
+                      {client.user &&
+                        client.user.powerLevel > client.powerLevels.create && (
                           <MenuItem
                             data={user}
                             onClick={async (e: any, data: any) => {

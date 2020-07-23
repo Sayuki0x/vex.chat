@@ -155,8 +155,7 @@ export class ChatWindow extends Component<Props, State> {
                             <ContextMenu
                               id={'username-trigger-' + messages[0].messageID}
                             >
-                              {messages[0].userID ===
-                                client.info().client?.userID && (
+                              {messages[0].userID === client.user?.userID && (
                                 <MenuItem
                                   data={messages[0]}
                                   onClick={this.props.changeNickname}
@@ -164,9 +163,9 @@ export class ChatWindow extends Component<Props, State> {
                                   Change Nickname
                                 </MenuItem>
                               )}
-                              {client.info().client &&
-                                client.info().client!.powerLevel >
-                                  client.info().powerLevels.grant && (
+                              {client.user &&
+                                client.user.powerLevel >
+                                  client.powerLevels.grant && (
                                   <MenuItem
                                     data={messages[0]}
                                     onClick={(e: any, data: any) => {
@@ -216,9 +215,9 @@ export class ChatWindow extends Component<Props, State> {
                                     Add To Channel
                                   </MenuItem>
                                 )}
-                              {client.info().client &&
-                                client.info().client!.powerLevel >
-                                  client.info().powerLevels.create && (
+                              {client.user &&
+                                client.user.powerLevel >
+                                  client.powerLevels.create && (
                                   <MenuItem
                                     data={messages[0]}
                                     onClick={async (e: any, data: any) => {

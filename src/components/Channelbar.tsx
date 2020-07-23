@@ -37,61 +37,59 @@ export class Channelbar extends Component<Props, State> {
         <p className="menu-label">
           <span className="menu-title-wrapper">Channels</span>
           <span className="icon-group">
-            {client.info().client &&
-              client.info().client!.powerLevel >
-                client.info().powerLevels.create && (
-                <span
-                  className="menu-button-wrapper"
-                  onClick={() => {
-                    let inputRef: any = React.createRef();
-                    let privateCheckRef: any = React.createRef();
+            {client.user && client.user.powerLevel > client.powerLevels.create && (
+              <span
+                className="menu-button-wrapper"
+                onClick={() => {
+                  let inputRef: any = React.createRef();
+                  let privateCheckRef: any = React.createRef();
 
-                    const newChannelForm = (
-                      <form
-                        onSubmit={async (event) => {
-                          event.preventDefault();
-                          if (inputRef.value === '') {
-                            return;
-                          }
-                          this.props.closeModal();
+                  const newChannelForm = (
+                    <form
+                      onSubmit={async (event) => {
+                        event.preventDefault();
+                        if (inputRef.value === '') {
+                          return;
+                        }
+                        this.props.closeModal();
 
-                          const channel = await client.channels.create(
-                            inputRef.value,
-                            privateCheckRef.checked
-                          );
-                          await client.channels.join(channel.channelID);
-                        }}
-                      >
-                        <p className="has-text-white">CREATE CHANNEL</p>
-                        <br />
-                        <label>Channel Name</label>
-                        <input
-                          autoFocus
-                          ref={(ref) => (inputRef = ref)}
-                          className={`input`}
-                        ></input>
-                        <br />
-                        <br />
-                        <input
-                          type="checkbox"
-                          ref={(ref) => (privateCheckRef = ref)}
-                        ></input>
-                        &nbsp;
-                        <label>Private?</label>
-                        <div className="modal-bottom-strip has-text-right">
-                          <button className="button is-black" type="submit">
-                            Save
-                          </button>
-                        </div>
-                      </form>
-                    );
+                        const channel = await client.channels.create(
+                          inputRef.value,
+                          privateCheckRef.checked
+                        );
+                        await client.channels.join(channel.channelID);
+                      }}
+                    >
+                      <p className="has-text-white">CREATE CHANNEL</p>
+                      <br />
+                      <label>Channel Name</label>
+                      <input
+                        autoFocus
+                        ref={(ref) => (inputRef = ref)}
+                        className={`input`}
+                      ></input>
+                      <br />
+                      <br />
+                      <input
+                        type="checkbox"
+                        ref={(ref) => (privateCheckRef = ref)}
+                      ></input>
+                      &nbsp;
+                      <label>Private?</label>
+                      <div className="modal-bottom-strip has-text-right">
+                        <button className="button is-black" type="submit">
+                          Save
+                        </button>
+                      </div>
+                    </form>
+                  );
 
-                    this.props.openModal(newChannelForm);
-                  }}
-                >
-                  <FontAwesomeIcon icon={faPlus} />
-                </span>
-              )}
+                  this.props.openModal(newChannelForm);
+                }}
+              >
+                <FontAwesomeIcon icon={faPlus} />
+              </span>
+            )}
           </span>
         </p>
         <ul className="menu-list">
@@ -200,9 +198,8 @@ export class Channelbar extends Component<Props, State> {
                     <p>Permissions</p>
                   </MenuItem>
                 )}
-                {client.info().client &&
-                  client.info().client!.powerLevel >
-                    client.info().powerLevels.delete && (
+                {client.user &&
+                  client.user.powerLevel > client.powerLevels.delete && (
                     <MenuItem
                       onClick={(event, data) => {
                         const deleteConfirm = (

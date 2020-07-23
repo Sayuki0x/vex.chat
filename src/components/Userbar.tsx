@@ -48,9 +48,9 @@ export class Userbar extends Component<Props, State> {
                       color: (this.props.userInfo as any).color,
                     }}
                   >
-                    {client.info().client!.username}
+                    {client.user?.username}
                     <span className="translucent">
-                      #{getUserHexTag(client.info().client!.userID)}
+                      #{getUserHexTag(client.user!.userID)}
                     </span>
                   </strong>
                   <span className="translucent">

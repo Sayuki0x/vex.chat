@@ -95,8 +95,7 @@ export const userProfile = async (
               avatarUploadRef?.click();
             }}
             style={{
-              display:
-                user.userID === client.info().client!.userID ? '' : 'none',
+              display: user.userID === client.user?.userID ? '' : 'none',
             }}
           >
             <FontAwesomeIcon icon={faFileUpload} />
@@ -152,8 +151,7 @@ export const userProfile = async (
           >
             <span
               onClick={() => {
-                if (user.userID === client.info().client!.userID)
-                  changeNickname();
+                if (user.userID === client.user?.userID) changeNickname();
               }}
             >
               {userDetails.username}
@@ -162,7 +160,7 @@ export const userProfile = async (
               </span>
             </span>
             &nbsp;&nbsp;
-            {user.userID === client.info().client!.userID && (
+            {user.userID === client.user?.userID && (
               <span
                 className="color-picker-wrapper"
                 onClick={() => {
@@ -223,7 +221,7 @@ export const userProfile = async (
             {userDetails.powerLevel}
           </p>
           <br />
-          {userDetails.userID === client.info().client!.userID && (
+          {userDetails.userID === client.user?.userID && (
             <div className="user-profile-self-section">
               <div className="buttons">
                 <button
