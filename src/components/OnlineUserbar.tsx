@@ -34,19 +34,7 @@ export class OnlineUserbar extends Component<Props, State> {
             uniqueArray(this.props.onlineLists[this.props.match.params.id]).map(
               (user) => {
                 return (
-                  <div
-                    key={'online-user-' + user.userID}
-                    onClick={async () => {
-                      this.props.openModal(
-                        await userProfile(
-                          user,
-                          this.props.closeModal,
-                          this.props.openModal,
-                          this.props.changeNickname
-                        )
-                      );
-                    }}
-                  >
+                  <div key={'online-user-' + user.userID}>
                     <ContextMenuTrigger
                       id={'online-user-trigger-' + user.userID}
                     >

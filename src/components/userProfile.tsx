@@ -123,7 +123,7 @@ export const userProfile = async (
                   console.log('client', client);
                   const view = new Uint8Array(file as ArrayBuffer);
                   const uploadedFileInfo = await client.files.create(
-                    Utils.toHexString(view),
+                    Utils.encodeHex(view),
                     fileEvent.target.files![0].name,
                     user.userID
                   );

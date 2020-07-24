@@ -147,6 +147,15 @@ input {
   padding: 20px;
 }
 
+.emoji-picker {
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  margin-bottom: 80px;
+  padding: 20px;
+  z-index: 6;
+}
+
 .icon-group > span {
   padding-left: 1ch;
 }
@@ -389,6 +398,15 @@ input {
   overflow-x: hidden; /* Disable horizontal scroll */
   background-color: $black-bis;
   border-bottom: 2px $black-ter solid;
+}
+
+.emoji-name {
+  margin-left: 2ch;
+  color: $white;
+}
+
+.emoji-option {
+  margin-bottom: 1ch;
 }
 
 .emoji {

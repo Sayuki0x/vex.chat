@@ -12,6 +12,7 @@ function parseMarkdown(message: IChatMessage) {
   const options = {
     source: message.message,
     linkTarget: '_blank',
+    escapeHtml: true,
     renderers: {
       link: ChatLink,
       image: ChatImage,

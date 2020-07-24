@@ -48,7 +48,7 @@ export class ChatWindow extends Component<Props, State> {
               const view = new Uint8Array(file as ArrayBuffer);
               console.log(view);
               const uploadedFileInfo = await client.files.create(
-                Utils.toHexString(view),
+                Utils.encodeHex(view),
                 acceptedFiles[0].name,
                 this.props.match.params.id
               );

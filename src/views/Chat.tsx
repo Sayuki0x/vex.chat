@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 
 import React, { Component } from 'react';
-import { IChannel, IChatMessage, IUser, Utils } from 'libvex';
+import { IChannel, IChatMessage, IUser, Utils, IEmoji } from 'libvex';
 import { client } from '../App';
 import { Redirect } from 'react-router-dom';
 import { Swipeable } from 'react-swipeable';
@@ -41,6 +41,7 @@ type State = {
   scrollLock: boolean;
   initialLoad: boolean;
   unreadMessageCounts: Record<string, number>;
+  queriedEmojis: IEmoji[];
 };
 
 type Props = {
@@ -77,6 +78,7 @@ export class Chat extends Component<Props, State> {
       leftBarClosing: false,
       initialLoad: true,
       unreadMessageCounts: {},
+      queriedEmojis: [],
     };
     this.imagesLoaded = [];
     this.scrollToBottom = this.scrollToBottom.bind(this);
@@ -93,6 +95,7 @@ export class Chat extends Component<Props, State> {
     this.pasteHandler = this.pasteHandler.bind(this);
     this.setScrollLock = this.setScrollLock.bind(this);
     this.setMessagesEnd = this.setMessagesEnd.bind(this);
+    this.setEmojiList = this.setEmojiList.bind(this);
   }
 
   setMessagesEnd(ref: any) {
@@ -130,7 +133,7 @@ export class Chat extends Component<Props, State> {
                 const view = new Uint8Array(file as ArrayBuffer);
                 console.log(view);
                 const uploadedFileInfo = await client.files.create(
-                  Utils.toHexString(view),
+                  Utils.encodeHex(view),
                   'user pasted image',
                   this.props.match.params.id
                 );
@@ -337,6 +340,12 @@ export class Chat extends Component<Props, State> {
     if (this.state.scrollLock) {
       this.scrollToBottom();
     }
+  }
+
+  setEmojiList(emojis: IEmoji[]) {
+    this.setState({
+      queriedEmojis: emojis,
+    });
   }
 
   setScrollLock(state: boolean) {
@@ -612,6 +621,31 @@ export class Chat extends Component<Props, State> {
             changeNickname={this.changeNickname}
             setScrollLock={this.setScrollLock}
           />
+
+          {this.state.queriedEmojis.length > 0 && (
+            <div
+              className={`emoji-picker ${chatWindowSize(
+                this.state.leftBarOpen,
+                this.state.rightBarOpen,
+                this.state.viewportWidth
+              )} `}
+            >
+              <div className="emoji-picker-container box has-background-black-bis">
+                {this.state.queriedEmojis.map((emoji) => (
+                  <p key={emoji.emojiID} className="emoji-option">
+                    <img
+                      className="emoji"
+                      src={client.getHost(false) + '/file/' + emoji.fileID}
+                      alt={'emoji-' + emoji.name}
+                    />
+                    <span className="emoji-name has-text-weight-bold">
+                      :{emoji.name}:
+                    </span>
+                  </p>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
         <div
           className={`${chatWindowSize(
@@ -624,6 +658,7 @@ export class Chat extends Component<Props, State> {
             scrollLock={this.state.scrollLock}
             scrollToBottom={this.scrollToBottom}
             match={this.props.match}
+            setEmojiList={this.setEmojiList}
           />
         </div>
         <Swipeable

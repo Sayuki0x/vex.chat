@@ -3070,6 +3070,14 @@ chalk@^3.0.0:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
 
+chalk@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/chalk/-/chalk-4.1.0.tgz#4e14870a618d9e2edd97dd8345fd9d9dc315646a"
+  integrity sha512-qwx12AxXe2Q5xQ43Ac//I6v5aXTipYrSESdOgzrN+9XjgEpyjpKuvSGaN4qE93f7TQTlerQQ8S+EQ0EyDoVL1A==
+  dependencies:
+    ansi-styles "^4.1.0"
+    supports-color "^7.1.0"
+
 character-entities-legacy@^1.0.0:
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/character-entities-legacy/-/character-entities-legacy-1.1.4.tgz#94bc1845dce70a5bb9d2ecc748725661293d8fc1"
@@ -7059,16 +7067,28 @@ levn@^0.3.0, levn@~0.3.0:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
 
-libvex@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/libvex/-/libvex-3.0.0.tgz#bf11c885a561f54523ab9ed69d7cba01eea17d2c"
-  integrity sha512-er+baRs0un/nON/3NedQbBB68Xo/vkupoyIvSXrqyBXS/tPobI+Qmn9RrAoBVdAKt8wQiEiHqMJN+WqJoy/Mqw==
+libvex-keyring@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/libvex-keyring/-/libvex-keyring-1.0.1.tgz#341bbbb26876ecfa4570ee72b005a26567e9c02f"
+  integrity sha512-s/fRFexhBZJt8Sl1NuOdXTfRENkQWQ/Inxm6xvWhvmJ/3H3LZ+FjkhgnTBpa2DUUV6qH5qo2eJ3agw2DygvZCg==
+  dependencies:
+    "@types/node" "^14.0.14"
+    chalk "^4.1.0"
+    tweetnacl "^1.0.3"
+    tweetnacl-util "^0.15.1"
+    typedoc-plugin-no-inherit "^1.1.10"
+
+libvex@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/libvex/-/libvex-4.1.0.tgz#41bc43f86c754e53d3fefe50bb1ba274c6d1e9e2"
+  integrity sha512-D9+lfSCkNMAk7vxnQhoEC24AMVcB6AaXC4aW3xtjavz4IfWzgfahLrI1KeIcOKfldrN/lXgxCzr4V4j8s/mc1w==
   dependencies:
     "@types/node" "^14.0.14"
     "@types/uuid" "^8.0.0"
     "@types/ws" "^7.2.5"
     isomorphic-ws "^4.0.1"
     knex "^0.21.1"
+    libvex-keyring "^1.0.1"
     moment "^2.27.0"
     tweetnacl "^1.0.3"
     tweetnacl-util "^0.15.1"
